@@ -1,0 +1,48 @@
+.container{
+    background-color: rgba(1, 1, 1, 0.03);
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    /* height: fit-content; */
+    margin-top: 20px;
+    border-radius: 8px;
+    color: rgb(102,102,102);
+}
+
+.header{
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    border-bottom: 0.3rem solid white;
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    flex-grow: 1;
+    padding: 0.4rem 0;
+}
+
+.addbutton{
+    color: black;
+    background-color: rgba(102, 153, 255, 0.6);
+    width: 100%;
+}
+
+.addbutton:hover{
+    background-color: rgba(102, 153, 255, 0.3);
+}
+
+.closeBtn{
+    font-size: 1.2rem;
+    padding: 0.3rem;
+    color: rgb(114, 115, 118);
+    align-self: center;
+}
+
+.closeBtn:hover{
+    border-radius: 12px;
+    background-color: rgba(1, 1, 1, 0.03);
+    transition: 0.2s ease-in-out;
+}

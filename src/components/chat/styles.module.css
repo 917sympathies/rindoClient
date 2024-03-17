@@ -1,0 +1,19 @@
+.closeBtn{
+    font-size: 1.6rem;
+    padding: 1px;
+}
+
+.closeBtn:hover{
+    border-radius: 12px;
+    background-color: rgba(1, 1, 1, 0.03);
+    transition: 0.2s ease-in-out;
+}
+
+.container{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 40vh;
+    height: 100%;
+    margin-bottom: 2rem;
+}

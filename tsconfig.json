@@ -21,6 +21,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/components/editor/CustomEditor.js", "src/components/editor/CustomEditor.tsx", "src/components/editor/CustomEditor.tsx"],
   "exclude": ["node_modules"]
 }

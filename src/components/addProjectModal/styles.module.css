@@ -1,0 +1,12 @@
+.createProjectBtn{
+    font-family: inherit;
+    margin-top: 2.5rem;
+    color: rgba(102, 153, 255, 0.6);
+    border: 1px solid rgba(102, 153, 255, 0.6);
+    border-radius: 16px; 
+}
+.createProjectBtn:hover{
+    background-color: rgba(102, 153, 255, 0.4);
+    border-color: rgba(102, 153, 255, 0.4);
+    color: white;
+}

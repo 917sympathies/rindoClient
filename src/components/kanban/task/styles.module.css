@@ -1,0 +1,26 @@
+.container{
+    margin-top: 10px;
+    /* background-color: rgba(1, 1, 1, 0.06); */
+    background-color: white;
+    border-radius: 16px;
+}
+
+.container:hover{
+    /* cursor: pointer; */
+    cursor: default;
+}
+
+.editBtn{
+    height:fit-content;
+    width: fit-content;
+    display: flex; 
+    justify-content: center; 
+    padding: 0.2rem;
+    border-radius: 6px;
+}
+
+.editBtn:hover{
+    cursor: pointer;
+    background-color: rgba(1, 1, 1, 0.03);
+    transition: 0.2s ease-in-out;
+}

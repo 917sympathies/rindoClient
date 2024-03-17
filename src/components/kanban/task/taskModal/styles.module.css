@@ -1,0 +1,30 @@
+.containertaskmodal{
+    background-color: white; 
+    width: 140vh;
+    height: 80vh; 
+    display: grid; 
+    grid-template-columns: 3fr 1fr;
+    padding: 0.4rem;
+}
+
+.container:focus-visible{
+    outline: none;
+}
+
+.closeBtn{
+    font-size: 1.6rem;
+    padding: 0.1rem;
+    color: black;
+    align-self: center;
+}
+
+.closeBtn:hover{
+    border-radius: 12px;
+    background-color: rgba(1, 1, 1, 0.03);
+    transition: 0.2s ease-in-out;
+}
+
+.select{
+    margin: 10px 0px;
+    width: 50%;
+}

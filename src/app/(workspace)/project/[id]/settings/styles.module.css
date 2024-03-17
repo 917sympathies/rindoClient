@@ -1,0 +1,21 @@
+.textField{
+    margin-left: 10px;
+    font-size: 1rem;
+    border-radius: 24px;
+}
+
+.checkmark{
+    align-self: center;
+    color: rgb(114, 115, 118);
+    font-size: 2rem;
+    margin-left: 10px;
+}
+
+.checkmark:hover{
+    color: lightgrey;
+    transition: 0.2s ease-in-out;
+}
+
+.checkmark:active{
+    color: inherit;
+}
