@@ -11,16 +11,17 @@ import { useState, useEffect } from "react";
 import { redirect, useParams, useRouter } from "next/navigation";
 import { IProject, IProjectSettings } from "@/types";
 import { SquareCheck  } from "lucide-react";
-import dynamic from "next/dynamic";
+import Editor from "@/components/editor";
+// import dynamic from "next/dynamic";
 
-const CustomEditor = dynamic(
-  () => {
-    return import("../../../../../components/editor/CustomEditor");
-  },
-  { ssr: false }
-);
+// const CustomEditor = dynamic(
+//   () => {
+//     return import("../../../../../components/editor/CustomEditor");
+//   },
+//   { ssr: false }
+// );
 
-export default function SetttingsPage() {
+export default function Page() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [projectSettings, setProjectSettings] = useState<IProject>(
@@ -49,6 +50,7 @@ export default function SetttingsPage() {
       if (response.ok) {
         const data = await response.json();
         setProjectSettings(data);
+        setDesc(data.description)
         console.log(data);
       }
     }
@@ -66,7 +68,7 @@ export default function SetttingsPage() {
     );
     if (response.ok === true) {
       router.push("/main");
-      redirect("/main");
+      // redirect("/main");
     }
   };
 
@@ -136,22 +138,25 @@ export default function SetttingsPage() {
         style={{
           display: "flex",
           flexDirection: "row",
-          justifyContent: "flex-start",
+          width: "60%",
+          justifyContent: "space-evenly",
           marginTop: "1rem",
         }}
       >
-        <InputLabel style={{ alignSelf: "center", fontSize: "1.2rem" }}>
+        <InputLabel style={{ alignSelf: "center", fontSize: "1.2rem", textOverflow: "ellipsis" }}>
           Описание проекта
         </InputLabel>
-        <CustomEditor
+        {/* <CustomEditor
           // initialData={
           //   //projectSettings == null ? "Описание..." : projectSettings.description
           //   projectSettings.description || "Описание..."
           // }
           setState={setDesc}
-        />
+        /> */}
+        <Editor desc={desc} setDesc={setDesc}/>
         <SquareCheck
           className={styles.checkmark}
+          size={48}
           onClick={() => handleChangeDescription()}
         />
       </div>

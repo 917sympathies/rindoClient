@@ -1,27 +1,26 @@
 "use client";
 import styles from "./layoutstyles.module.css";
-import type { PropsWithChildren } from "react";
 import { useState, useEffect } from "react";
 import Header from "@/components/header";
 import { IProject } from "@/types";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import {Kanban, GanttChart, TableProperties } from 'lucide-react'
-import { Tab } from "@mui/material";
 
 interface Props {
   children: React.ReactNode;
   params: { id: string };
 }
 
-export default function WorkspaceLayout({ children, params }: Props) {
+export default function Layout({ children, params }: Props) {
   const pathname = usePathname();
-  const [project, setProject] = useState<IProject | null>(null);
+  const { id } = useParams<{ id: string }>();
+  //const [project, setProject] = useState<IProject | null>(null);
   const [isSelectorVisible, setIsSelectorVisible] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<string>(pathname.split("/")[3]);
 
   useEffect(() => {
-    getProjectInfo(params.id);
+    //getProjectInfo(params.id);
   }, [params.id]);
 
   useEffect(() => {
@@ -32,22 +31,22 @@ export default function WorkspaceLayout({ children, params }: Props) {
     if(currentPage === "settings") setIsSelectorVisible(false);
   }, [currentPage])
 
-  const getProjectInfo = async (id: string) => {
-    const response = await fetch(`http://localhost:5000/api/project/${id}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-    });
-    const data = await response.json();
-    console.log(data);
-    setProject(data);
-  };
+  // const getProjectInfo = async (id: string) => {
+  //   const response = await fetch(`http://localhost:5000/api/project/${id}`, {
+  //     method: "GET",
+  //     headers: { "Content-Type": "application/json" },
+  //     credentials: "include",
+  //   });
+  //   const data = await response.json();
+  //   console.log(data);
+  //   setProject(data);
+  // };
   return (
     <div style={{display: "flex", flexDirection: "column"}}>
-      <Header projectInfo={project} setIsSelectorVisible={setIsSelectorVisible}/>
+      <Header setIsSelectorVisible={setIsSelectorVisible}/>
       {isSelectorVisible ?
       <div className={styles.selector}>
-        <Link href={`/project/${project?.id}/board`}>
+        <Link href={`/project/${id}/board`}>
           <div className={currentPage == "board" ? styles.selectoritemselected : styles.selectoritem}>
             <Kanban style={{color: "inherit"}} size={16}/>
             <p style={{ margin: "0", alignSelf: "center", padding: "0.3rem" }}>
@@ -55,7 +54,7 @@ export default function WorkspaceLayout({ children, params }: Props) {
             </p>
           </div>
         </Link>
-        <Link href={`/project/${project?.id}/list`}>
+        <Link href={`/project/${id}/list`}>
           <div className={currentPage == "list" ? styles.selectoritemselected : styles.selectoritem}>
             <TableProperties style={{color: "inherit"}} size={16}/>
             <p style={{ margin: "0", alignSelf: "center", padding: "0.3rem" }}>
@@ -63,11 +62,11 @@ export default function WorkspaceLayout({ children, params }: Props) {
             </p>
           </div>
         </Link>
-        <Link href={`/project/${project?.id}/gantt`}>
+        <Link href={`/project/${id}/gantt`}>
           <div className={currentPage == "gantt" ? styles.selectoritemselected : styles.selectoritem}>
             <GanttChart style={{color: "inherit"}} size={16}/>
             <p style={{ margin: "0", alignSelf: "center", padding: "0.3rem" }}>
-              Гант
+              Диаграмма Ганта
             </p>
           </div>
         </Link>

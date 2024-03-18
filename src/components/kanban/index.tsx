@@ -79,7 +79,6 @@ export default function Kanban() {
       credentials: "include",
     });
     const data = await response.json();
-    console.log(data);
     setStages(data);
   }
 

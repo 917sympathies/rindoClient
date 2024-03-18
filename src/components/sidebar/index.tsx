@@ -11,65 +11,50 @@ import Link from "next/link";
 import { useRouter, useParams, redirect } from "next/navigation";
 import {
   Button,
-  Box,
   IconButton,
   List,
   ListItem,
   ListItemButton,
   Typography,
+  Drawer,
 } from "@mui/material";
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DropResult,
-} from "react-beautiful-dnd";
-import { SquareActivity, ArrowDown, Plus } from 'lucide-react'
-import StarOutlineIcon from "@mui/icons-material/StarOutline";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import AddIcon from "@mui/icons-material/Add";
+import { SquareActivity, ArrowDown, Plus } from "lucide-react";
 import AddProjectModal from "../addProjectModal";
 import { useCookies } from "react-cookie";
 import { jwtDecode } from "jwt-decode";
 import { IUser } from "@/types";
-import { CookieInfo } from "@/types";
+import { ICookieInfo } from "@/types";
 
 interface ISidebarProps {
-  toFetch: boolean;
-  setFetch: Dispatch<SetStateAction<boolean>>;
-  onCreate: () => void;
+  // toFetch: boolean;
+  // setFetch: Dispatch<SetStateAction<boolean>>;
+  // onCreate: () => void;
 }
 
-interface IProjectInfo{
-  id: string,
-  name: string
+interface IProjectInfo {
+  id: string;
+  name: string;
 }
 
-const Sidebar = ({ ...props }: ISidebarProps) => {
+const Sidebar = ({}: ISidebarProps) => {
   const router = useRouter();
   const [cookies, setCookie, removeCookie] = useCookies(["test-cookies"]);
-  const { onCreate, toFetch, setFetch } = props;
   const { id } = useParams();
   const [user, setUser] = useState<IUser>();
-  const [projects, setProjects] = useState<IProjectInfo[] | null>(null)
+  const [projects, setProjects] = useState<IProjectInfo[] | null>(null);
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [toFetch, setFetch] = useState(false);
 
   useEffect(() => {
     const fetchProjectsInfo = async () => {
       const token = cookies["test-cookies"];
       if (token === undefined) {
-        return;
+        // return;
         router.push("/login");
         redirect("/login");
       }
-      const decoded = jwtDecode(token) as CookieInfo;
-      // const response = await fetch(
-      //   `http://localhost:5000/api/user/${decoded.userId}`,
-      //   {
-      //     method: "GET",
-      //     headers: { "Content-Type": "application/json" },
-      //     credentials: "include",
-      //   }
-      // );
+      const decoded = jwtDecode(token) as ICookieInfo;
       const response = await fetch(
         `http://localhost:5000/api/project?userId=${decoded.userId}`,
         {
@@ -109,10 +94,10 @@ const Sidebar = ({ ...props }: ISidebarProps) => {
               justifyContent: "space-between",
             }}
           >
-            <ArrowDown 
-              style={{ color: "rgb(102, 153, 255)", marginRight: "6px"}}
+            <ArrowDown
+              style={{ color: "rgb(102, 153, 255)", marginRight: "6px" }}
               size={16}
-            /> 
+            />
             {/* color: "#4b0066" */}
             <div
               style={{
@@ -145,23 +130,23 @@ const Sidebar = ({ ...props }: ISidebarProps) => {
                   color: "inherit",
                   width: "100%",
                   display: "flex",
-                  alignItems: "center"
+                  alignItems: "center",
                 }}
               >
-                {/* <GoProject
-                  style={{ marginRight: "12px", fontSize: "1rem" }}
-                ></GoProject> */} 
-                {/* color="#ff66ff" */}
-                <SquareActivity style={{marginRight: "12px"}} size={16} color="rgba(1, 1, 1, 0.6)"/>
+                <SquareActivity
+                  style={{ marginRight: "12px" }}
+                  size={16}
+                  color="rgba(1, 1, 1, 0.6)"
+                />
                 {project.name}
               </Link>
             </div>
           ))}
         <ListItemButton
           className={styles.addProjectBtn}
-          onClick={() => onCreate()}
+          onClick={() => setIsOpen(true)}
         >
-          <Plus style={{ color: "inherit", marginRight: "6px" }} size={16}/>
+          <Plus style={{ color: "inherit", marginRight: "6px" }} size={16} />
           <div
             style={{
               color: "inherit",
@@ -190,6 +175,14 @@ const Sidebar = ({ ...props }: ISidebarProps) => {
           Выйти
         </div>
       </Button>
+      <Drawer
+        anchor={"right"}
+        open={isOpen}
+        onClose={() => {}}
+        sx={{ maxWidth: "40vw" }}
+      >
+        <AddProjectModal onClose={() => setIsOpen(false)} setFetch={setFetch} />
+      </Drawer>
     </div>
   );
 };

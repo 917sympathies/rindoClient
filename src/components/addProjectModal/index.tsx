@@ -13,18 +13,19 @@ import AddIcon from "@mui/icons-material/Add";
 import ClearIcon from "@mui/icons-material/Clear";
 import CloseIcon from "@mui/icons-material/Close";
 import React from 'react';
-import dynamic from 'next/dynamic';
+//import dynamic from 'next/dynamic';
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode"
-import { CookieInfo } from "@/types";
+import { ICookieInfo } from "@/types";
 import { LocalizationProvider, DatePicker  } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from "dayjs";
+import Editor from "../editor";
 
-const CustomEditor = dynamic( () => {
-  return import( '../editor/CustomEditor' );
-}, { ssr: false } );
+// const CustomEditor = dynamic( () => {
+//   return import( '../editor/CustomEditor' );
+// }, { ssr: false } );
 
 interface IAddProjectModalProps {
   setFetch: Dispatch<SetStateAction<boolean>>,
@@ -51,7 +52,7 @@ const AddProjectModal = ({ setFetch, onClose }: IAddProjectModalProps) => {
   const handleCreateProject = async () => {
     const token = cookies["test-cookies"];
     if(token === undefined) router.push("/login");
-    const decoded = jwtDecode(token) as CookieInfo;
+    const decoded = jwtDecode(token) as ICookieInfo;
     project.ownerId = decoded.userId;
     const response = await fetch("http://localhost:5000/api/project", {
         method: "POST",
@@ -272,10 +273,11 @@ const AddProjectModal = ({ setFetch, onClose }: IAddProjectModalProps) => {
                 maxWidth: "100%",
               }}
             >
-                <CustomEditor
+              <Editor desc={desc} setDesc={setDesc}/>
+                {/* <CustomEditor
                     // initialData={desc}
                     setState={setDesc}
-                />
+                /> */}
             </div>
           </div>
           <div style={{ marginTop: "1rem" }}>

@@ -28,12 +28,13 @@ export interface IUserInfo {
     email: string,
 }
 
-interface IMessage {
+export interface IMessage {
     senderId: string,
-    chatId: string
+    chatId: string,
+    content: string
 }
 
-interface IChat {
+export interface IChat {
     id: string,
     projectId: string,
     messages: IMessage[]
@@ -54,6 +55,11 @@ export interface ITask {
 
 export interface ITaskComment{
     id: string,
+    content: string,
+    username: string,
+    taskId: string,
+    userId: string,
+    time: string
 }
 
 export interface IRole {
@@ -85,7 +91,7 @@ export interface IProject{
     roles: IRole[]
 }
 
-export interface CookieInfo {
+export interface ICookieInfo {
     userId : string,
     exp: number
 }

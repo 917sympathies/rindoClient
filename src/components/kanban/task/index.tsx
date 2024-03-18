@@ -26,9 +26,11 @@ function Task({ task, setFetch }: ITaskProps) {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [responsibleUser, setResponsibleUser] = useState<IUser | null>(null);
+  const [commentsAmount, setCommentsAmount] = useState<number | null>(null);
 
   useEffect(() => {
     if (task.responsibleUserId !== null) getUserInfo(task.responsibleUserId);
+    getCommentsCount();
   }, []);
 
   const getUserInfo = async (id: string) => {
@@ -40,6 +42,16 @@ function Task({ task, setFetch }: ITaskProps) {
     const data = await response.json();
     setResponsibleUser(data);
   };
+
+  const getCommentsCount =async () => {
+    const response = await fetch(`http://localhost:5000/api/comment?taskId=${task.id}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+    const data = await response.json();
+    setCommentsAmount(data);
+  }
 
   const handleOpenModal = useCallback(
     (open: boolean) => {
@@ -92,7 +104,7 @@ function Task({ task, setFetch }: ITaskProps) {
           <div>
             {responsibleUser == null ? (
               <>
-                <p style={{ margin: "0 0.4rem" }}>Нет ответственного</p>
+                <p style={{ margin: "0 0.4rem", fontSize: "0.8rem", padding: "0 0.6rem", backgroundColor: "yellow", borderRadius: "16px" }}>Для всех</p>
               </>
             ) : (
               <div style={{display: "flex", flexDirection: "row", alignItems: "center", margin: "0.2rem 0"}}>
@@ -126,7 +138,7 @@ function Task({ task, setFetch }: ITaskProps) {
           >
             <MessageCircle style={{ marginRight: "0.4rem" }} size={16} />
             <div style={{ marginRight: "0.4rem", fontFamily: "inherit", fontSize: "0.8rem" }}>
-              {task.comments ? task.comments.length + " комментариев" : "0 комментариев"}
+              {commentsAmount ? commentsAmount + " комментариев" : "0 комментариев"}
             </div>
           </div>
         </div>

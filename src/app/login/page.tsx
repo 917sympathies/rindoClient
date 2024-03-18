@@ -6,7 +6,7 @@ import { TextField, Button, Typography, Box } from "@mui/material";
 import { useSession } from "next-auth/react";
 import { useCookies } from "react-cookie"
 import { jwtDecode } from "jwt-decode";
-import { CookieInfo } from "@/types";
+import { ICookieInfo } from "@/types";
 import path from "path";
 
 
@@ -58,7 +58,7 @@ export default function Login() {
   useEffect(() => {
     if(cookies["test-cookies"]){
       const token = cookies["test-cookies"];
-      const decoded = jwtDecode(token) as CookieInfo;
+      const decoded = jwtDecode(token) as ICookieInfo;
       console.log("exp > now: ")
       console.log(decoded.exp > new Date().getTime());
       if(decoded.exp > new Date().getTime()){

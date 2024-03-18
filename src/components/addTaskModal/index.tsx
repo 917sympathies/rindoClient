@@ -17,20 +17,21 @@ import AddIcon from "@mui/icons-material/Add";
 import ClearIcon from "@mui/icons-material/Clear";
 import CloseIcon from "@mui/icons-material/Close";
 import React from "react";
-import dynamic from "next/dynamic";
+//import dynamic from "next/dynamic";
 import { IProject, ITask, IUser } from "@/types";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { useParams } from "next/navigation";
 import { IUserInfo } from "@/types";
+import Editor from "../editor";
 
-const CustomEditor = dynamic(
-  () => {
-    return import("../editor/CustomEditor");
-  },
-  { ssr: false }
-);
+// const CustomEditor = dynamic(
+//   () => {
+//     return import("../editor/CustomEditor");
+//   },
+//   { ssr: false }
+// );
 
 interface IAddTaskModalProps {
   // projectId: string | undefined;
@@ -288,9 +289,10 @@ IAddTaskModalProps) => {
                 maxWidth: "100%",
               }}
             >
-              <div style={{width: "100%"}}>
+              {/* <div style={{width: "100%"}}>
                 <textarea className={styles.editor} value={desc} onChange={(e) => setDesc(e.target.value)}></textarea>
-              </div>
+              </div> */}
+              <Editor desc={desc} setDesc={setDesc}/>
               {/* <CustomEditor
                 // initialData={desc}
                 setState={setDesc}

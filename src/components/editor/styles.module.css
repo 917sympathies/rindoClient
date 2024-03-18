@@ -1,0 +1,15 @@
+.editor {
+    border: 1px solid rgba(1, 1, 1, 0.3);
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    font-family: inherit;
+    resize: none;
+    border-radius: 6px;
+    height: 20vh;
+    width: 96%;
+    padding: 0.6rem;
+  }
+  
+  .editor:focus{
+      outline: none;
+  }

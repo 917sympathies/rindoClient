@@ -6,7 +6,7 @@ import { useParams, usePathname, useRouter, useSearchParams } from "next/navigat
 import { useState, useEffect } from "react";
 import TaskModal from "../kanban/task/taskModal";
 import Modal from "@mui/material/Modal/Modal";
-import { Trash2  } from "lucide-react";
+import { Trash2, PencilLine  } from "lucide-react";
 
 interface TaskListProps {}
 
@@ -65,16 +65,16 @@ export default function TaskList({}: TaskListProps) {
             <div
               className={styles.taskcontainer}
               key={task.id}
-              onClick={() => router.push(pathname + "?" + handleOpenModal(task.id))}
             >
               <div className={styles.header}>
                 <p>{task.name}</p>
+                <PencilLine className={styles.btn} size={16} onClick={() => router.push(pathname + "?" + handleOpenModal(task.id))}/>
               </div>
               <div className={styles.taskbody}>
                 <div>
                 <p>{task.description}</p>
                 </div>
-                <Trash2 size={16}/>
+                <Trash2 className={styles.btn} size={16}/>
               </div>
             </div>
           ))
