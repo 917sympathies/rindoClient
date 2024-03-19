@@ -13,7 +13,7 @@ import { MessageCircle } from "lucide-react";
 import TaskModal from "./taskModal";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import {PencilLine } from 'lucide-react'
+import { PencilLine } from "lucide-react";
 
 interface ITaskProps {
   task: ITask;
@@ -27,6 +27,7 @@ function Task({ task, setFetch }: ITaskProps) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [responsibleUser, setResponsibleUser] = useState<IUser | null>(null);
   const [commentsAmount, setCommentsAmount] = useState<number | null>(null);
+  const [commentLabel, setCommentLabel] = useState<string>("комментариев");
 
   useEffect(() => {
     if (task.responsibleUserId !== null) getUserInfo(task.responsibleUserId);
@@ -43,15 +44,31 @@ function Task({ task, setFetch }: ITaskProps) {
     setResponsibleUser(data);
   };
 
-  const getCommentsCount =async () => {
-    const response = await fetch(`http://localhost:5000/api/comment?taskId=${task.id}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-    });
+  const getCommentsCount = async () => {
+    const response = await fetch(
+      `http://localhost:5000/api/comment?taskId=${task.id}`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      }
+    );
     const data = await response.json();
     setCommentsAmount(data);
-  }
+    changeLabel(data);
+  };
+
+  const changeLabel = (data: number) => {
+    if (data === 0 || (data > 4 && data < 21)) setCommentLabel("комментариев");
+    else if (data > 1 && data < 5) setCommentLabel("комментария");
+    else if (data === 1) setCommentLabel("комментарий");
+    else {
+      const val = data % 10;
+      if (val === 0 || (val > 4 && val < 21)) setCommentLabel("комментариев");
+      else if (val > 1 && val < 5) setCommentLabel("комментария");
+      else if (val === 1) setCommentLabel("комментарий");
+    }
+  };
 
   const handleOpenModal = useCallback(
     (open: boolean) => {
@@ -65,9 +82,7 @@ function Task({ task, setFetch }: ITaskProps) {
 
   return (
     <>
-      <div
-        className={styles.container}
-      >
+      <div className={styles.container}>
         <p
           style={{
             display: "flex",
@@ -84,12 +99,29 @@ function Task({ task, setFetch }: ITaskProps) {
           }}
         >
           <div>{task.name}</div>
-          <div className={styles.editBtn} onClick={() => router.push(pathname + "?" + handleOpenModal(true))}>
-            <PencilLine size={16} color="rgb(102,102,102)"/>
+          <div
+            className={styles.editBtn}
+            onClick={() => router.push(pathname + "?" + handleOpenModal(true))}
+          >
+            <PencilLine size={16} color="rgb(102,102,102)" />
           </div>
         </p>
-        <div style={{fontSize: "0.7rem", margin: "0.2rem 0.8rem"}}>
-          {task.description}
+        <div style={{ fontSize: "0.7rem", margin: "0.2rem 0.8rem" }}>
+          {/* {task.description} */}
+          <textarea
+            value={task.description}
+            disabled
+            cols={30}
+            maxLength={100}
+            style={{
+              backgroundColor: "inherit",
+              fontFamily: "inherit",
+              resize: "none",
+              border: "0",
+              overflow: "hidden",
+              height: "auto",
+            }}
+          ></textarea>
         </div>
         <div
           style={{
@@ -104,10 +136,27 @@ function Task({ task, setFetch }: ITaskProps) {
           <div>
             {responsibleUser == null ? (
               <>
-                <p style={{ margin: "0 0.4rem", fontSize: "0.8rem", padding: "0 0.6rem", backgroundColor: "yellow", borderRadius: "16px" }}>Для всех</p>
+                <p
+                  style={{
+                    margin: "0 0.4rem",
+                    fontSize: "0.8rem",
+                    padding: "0 0.6rem",
+                    backgroundColor: "yellow",
+                    borderRadius: "16px",
+                  }}
+                >
+                  Для всех
+                </p>
               </>
             ) : (
-              <div style={{display: "flex", flexDirection: "row", alignItems: "center", margin: "0.2rem 0"}}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  margin: "0.2rem 0",
+                }}
+              >
                 <Avatar
                   sx={{
                     bgcolor: "#4198FF",
@@ -115,7 +164,7 @@ function Task({ task, setFetch }: ITaskProps) {
                     height: "2.5vh",
                     fontSize: "0.6rem",
                     margin: "0.1rem",
-                    marginLeft: "0.4rem"
+                    marginLeft: "0.4rem",
                   }}
                   src="/static/images/avatar/1.jpg"
                 >
@@ -137,8 +186,16 @@ function Task({ task, setFetch }: ITaskProps) {
             }}
           >
             <MessageCircle style={{ marginRight: "0.4rem" }} size={16} />
-            <div style={{ marginRight: "0.4rem", fontFamily: "inherit", fontSize: "0.8rem" }}>
-              {commentsAmount ? commentsAmount + " комментариев" : "0 комментариев"}
+            <div
+              style={{
+                marginRight: "0.4rem",
+                fontFamily: "inherit",
+                fontSize: "0.8rem",
+              }}
+            >
+              {commentsAmount
+                ? commentsAmount + " " + commentLabel
+                : "0 комментариев"}
             </div>
           </div>
         </div>

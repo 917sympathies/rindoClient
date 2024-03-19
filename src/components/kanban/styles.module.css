@@ -15,7 +15,7 @@
     /* justify-content: center; */
 }
 
-.selectoritem{
+/* .selectoritem{
     background-color: rgba(75, 0, 102, 0.1);
     color: rgb(102,102,102);
     padding: 0 0.4rem;
@@ -29,7 +29,7 @@
     padding: 0 0.4rem;
     border-radius: 4px;
     justify-content: center;
-}
+} */
 
 .addbutton{
     width: 90%; 

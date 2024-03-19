@@ -2,17 +2,16 @@
 import styles from "./layoutstyles.module.css";
 import { useState, useEffect } from "react";
 import Header from "@/components/header";
-import { IProject } from "@/types";
+// import { IProject } from "@/types";
 import Link from "next/link";
 import { usePathname, useParams } from "next/navigation";
 import {Kanban, GanttChart, TableProperties } from 'lucide-react'
 
 interface Props {
   children: React.ReactNode;
-  params: { id: string };
 }
 
-export default function Layout({ children, params }: Props) {
+export default function Layout({ children }: Props) {
   const pathname = usePathname();
   const { id } = useParams<{ id: string }>();
   //const [project, setProject] = useState<IProject | null>(null);
@@ -21,7 +20,7 @@ export default function Layout({ children, params }: Props) {
 
   useEffect(() => {
     //getProjectInfo(params.id);
-  }, [params.id]);
+  }, [id]);
 
   useEffect(() => {
     setCurrentPage(pathname.split("/")[3]);

@@ -6,17 +6,24 @@
     /* cursor: pointer; */
 }
 
+
 .taskcontainer{
     margin: 0.4rem;
+    padding: 0 1rem;
     border-radius: 8px;
     border: 0.1rem solid rgba(1, 1, 1, 0.1);
     font-family: inherit;
     color: black;
-    min-height: 10vh;
+    /* min-height: 10vh; */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .header{
-    margin: 0.4rem 1rem;
+    /* margin: 0.4rem 1rem; */
+    height: 100%;
     font-size: 1.2rem;
     display: flex;
     flex-direction: row;
