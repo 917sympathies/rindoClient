@@ -95,8 +95,8 @@ export default function Chat({
 
   try {
     if(conn){
-    conn.on(`ReceiveProject${chatId}`, (username, message) => {
-      const str = {senderId: username, content: message} as IMessage;
+    conn.on(`ReceiveProject${chatId}`, (userId, username, message) => {
+      const str = {senderId: userId, username: username, content: message} as IMessage;
       setChatMessages([...chatMessages, str]);
       // setChat((prevState) => ({
       //   ...prevState,
@@ -268,7 +268,7 @@ export default function Chat({
                     }}
                   >
                     <Typography color={"#87888C"} sx={{ fontSize: ".7rem" }}>
-                      {message.senderId}
+                      {message.username}
                     </Typography>
                     <div
                       style={{

@@ -31,7 +31,8 @@ export interface IUserInfo {
 export interface IMessage {
     senderId: string,
     chatId: string,
-    content: string
+    content: string,
+    username: string
 }
 
 export interface IChat {
