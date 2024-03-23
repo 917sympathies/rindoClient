@@ -3,17 +3,16 @@ import { useState, useContext, useEffect } from "react";
 import styles from "./styles.module.css";
 import { redirect, useRouter } from "next/navigation";
 import { TextField, Button, Typography, Box } from "@mui/material";
-import { useSession } from "next-auth/react";
 import { useCookies } from "react-cookie"
 import { jwtDecode } from "jwt-decode";
 import { ICookieInfo } from "@/types";
-import path from "path";
 
 
 export default function Login() {
   const router = useRouter();
   const [cookies, setCookie, removeCookie] = useCookies(['test-cookies']);
   const [isAuth, setIsAuth] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true)
   const [usernameInput, setUsername] = useState("");
   const [passwordInput, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -34,6 +33,7 @@ export default function Login() {
         setErrorMessage(data.description);
         return;
       }
+      setLocalStorage();
       setIsAuth(true);
       setUsername("");
       setPassword("");
@@ -54,20 +54,46 @@ export default function Login() {
 
   //   setIsAuth(true);
   // }
-  
-  useEffect(() => {
-    if(cookies["test-cookies"]){
+
+  const setLocalStorage = () => {
+    if(cookies['test-cookies']){
       const token = cookies["test-cookies"];
       const decoded = jwtDecode(token) as ICookieInfo;
-      console.log("exp > now: ")
-      console.log(decoded.exp > new Date().getTime());
+      localStorage.setItem("token",JSON.stringify(decoded));
+    }
+  }
+  
+  useEffect(() => {
+    if(cookies['test-cookies']){
+      const token = cookies["test-cookies"];
+      const decoded = jwtDecode(token) as ICookieInfo;
       if(decoded.exp > new Date().getTime()){
         removeCookie("test-cookies", {path:'/'});
+        setIsLoading(false);
         return;
       }
+      localStorage.setItem("token", JSON.stringify(decoded));
       setIsAuth(true);
+      redirect('/main')
     }
+    setIsLoading(false);
   }, [cookies]);
+
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token");
+  //   if(!token){
+  //     setIsLoading(false);
+  //     return;
+  //   }
+  //   const exp = JSON.parse(token).exp;
+  //   if(exp > new Date().getTime()){
+  //     removeCookie("test-cookies", {path:'/'});
+  //     setIsLoading(false);
+  //     return;
+  //   }
+  //   setIsAuth(true);
+  //   redirect('/main')
+  // }, [])
 
   const signUp = () => {
     router.push("/signup");
