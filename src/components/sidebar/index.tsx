@@ -86,6 +86,54 @@ const Sidebar = ({}: ISidebarProps) => {
   return (
     <div className={styles.container}>
       <List disablePadding sx={{ width: "90%", maxHeight: "80vh" }}>
+        {/* <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="36"
+            height="36"
+            viewBox="0 0 100 100"
+            fill="none"
+          >
+            <rect width="36" height="36" fill="white" />
+            <path
+              d="M42.5 16H59L30 75H12L42.5 16Z"
+              fill="#88FFD4"
+              fill-opacity="0.7"
+            />
+            <path
+              d="M54.6383 46.514C44.2979 45.3575 42 46.514 42 46.514L64.2128 92H78C78 92 64.9787 47.6704 54.6383 46.514Z"
+              fill="#88FFD4"
+              fill-opacity="0.5"
+            />
+            <path
+              d="M56.5 16H93.5C93.5 16 101 18 93.5 27C86 36 51 27 51 27L56.5 16Z"
+              fill="#88FFD4"
+              fill-opacity="0.3"
+            />
+            <path
+              d="M70 24C68 17 60 24 86 24C112 24 57.5 48 57.5 48C57.5 48 38 46 42.5 46.5C47 47 72 31 70 24Z"
+              fill="#88FFD4"
+              fill-opacity="0.4"
+            />
+          </svg>
+          <Typography
+            style={{
+              textTransform: "uppercase",
+              fontFamily: "inherit",
+              fontSize: "1.1rem",
+              color: "rgba(136, 255, 212, 0.4)",
+            }}
+          >
+            indo
+          </Typography>
+        </div> */}
         <ListItem>
           <div
             style={{

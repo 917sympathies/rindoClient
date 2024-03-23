@@ -1,4 +1,68 @@
-.textField{
+.container{
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    height: 100%;
+}
+
+.body{
+    margin-top: 4rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.deleteUserBtn{
+    padding: 0.2rem;
+    border-radius: 1rem;
+}
+
+.deleteUserBtn:hover{
+    background-color: rgba(1, 1, 1, 0.1);
+    transition: 0.2s ease-in-out;
+}
+
+.sidebar{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: 2rem;
+    padding-left: 2rem;
+    border-right: 1px solid rgba(1, 1, 1, 0.1);
+    /* height: 100%; */
+    /* border-bottom:1px solid rgba(1, 1, 1, 0.1) ; */
+}
+
+.sidebaritem{
+    width: 80%;
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0.5rem 0;
+    padding: 0.4rem 0.8rem;
+    border-radius: 1rem;
+    color: black;
+    background-color: rgba(1, 1, 1, 0.2);
+}
+
+.sidebaritem:hover{
+    cursor: pointer;
+    background-color: rgba(1, 1, 1, 0.1);
+    transition: 0.2s ease-in-out;
+}
+
+.selectedsidebaritem{
+    width: 80%;
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0.5rem 0;
+    padding: 0.4rem 0.8rem;
+    border-radius: 1rem;
+    color: black;
+    background-color: rgba(1, 1, 1, 0.1);
+}
+
+
+
+/* .textField{
     margin-left: 10px;
     font-size: 1rem;
     border-radius: 24px;
@@ -17,4 +81,4 @@
 
 .checkmark:active{
     color: inherit;
-}
+} */

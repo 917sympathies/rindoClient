@@ -11,6 +11,8 @@ import { useCookies } from "react-cookie";
 
 interface HeaderProps {
   setIsSelectorVisible: Dispatch<SetStateAction<boolean>>;
+  isChatActive: boolean,
+  setIsChatActive: Dispatch<SetStateAction<boolean>>;
 }
 
 interface IProject{
@@ -21,10 +23,12 @@ interface IProject{
 
 export default function Header({
   setIsSelectorVisible,
+  isChatActive,
+  setIsChatActive
 }: HeaderProps) {
   const { id } = useParams<{ id: string }>();
   const [isOwner, setIsOwner] = useState<boolean>(false);
-  const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
+  // const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [cookies, setCookie, removeCookie] = useCookies(["test-cookies"]);
   const [project, setProject] = useState<IProject | null>(null);
 
@@ -57,7 +61,7 @@ export default function Header({
         {/* {project && project.owner?.username} / {project && project.name} */}
         {project && project.name}
       </h2>
-      <div className={styles.chatButton} onClick={() => setIsChatOpen(true)}>
+      <div className={styles.chatButton} onClick={() => setIsChatActive(!isChatActive)}>
         <h3>Чат проекта</h3>
       </div>
       <Link
@@ -78,13 +82,16 @@ export default function Header({
       )}
       <Drawer
         anchor={"right"}
-        open={isChatOpen}
+        open={isChatActive}
+        variant="persistent"
+        transitionDuration={300}
+        sx={{maxWidth: "40vw", '& .MuiPaper-root': { boxShadow: '-1vw 0px 15px #F4F6F8'}, }}
         onClose={() => {}}
-        sx={{ maxWidth: "40vw" }}
+        // sx={{ maxWidth: "40vw" }}
       >
         <Chat
-          isActive={isChatOpen}
-          onClose={() => setIsChatOpen(false)}
+          isActive={isChatActive}
+          onClose={() => setIsChatActive(false)}
           chatId={project?.chatId}
           projectName={project?.name}
         />

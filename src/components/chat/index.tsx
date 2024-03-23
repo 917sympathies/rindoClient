@@ -209,6 +209,7 @@ export default function Chat({
                           fontSize: ".9rem",
                           color: "white",
                         }}
+                        style={{color: "white"}}
                       >
                         {message.content}
                       </Typography>
@@ -267,7 +268,7 @@ export default function Chat({
                       borderRadius: ".6rem",
                     }}
                   >
-                    <Typography color={"#87888C"} sx={{ fontSize: ".7rem" }}>
+                    <Typography color={"#87888C"} sx={{ fontSize: ".7rem" }} style={{color: "#87888C"}}>
                       {message.username}
                     </Typography>
                     <div
@@ -285,6 +286,7 @@ export default function Chat({
                           fontSize: ".9rem",
                           color: "black",
                         }}
+                        style={{color: "black"}}
                       >
                         {message.content}
                       </Typography>
