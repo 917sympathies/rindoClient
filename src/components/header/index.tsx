@@ -3,7 +3,17 @@ import styles from "./styles.module.css";
 import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import Link from "next/link";
 import Chat from "../chat";
-import { Drawer } from "@mui/material";
+import { Sheet, SheetContent } from "../ui/sheet";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "../ui/drawer";
 import { useParams } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 import { ICookieInfo } from "@/types";
@@ -11,20 +21,20 @@ import { useCookies } from "react-cookie";
 
 interface HeaderProps {
   setIsSelectorVisible: Dispatch<SetStateAction<boolean>>;
-  isChatActive: boolean,
+  isChatActive: boolean;
   setIsChatActive: Dispatch<SetStateAction<boolean>>;
 }
 
-interface IProject{
-  name: string,
-  chatId: string,
-  ownerId: string
+interface IProject {
+  name: string;
+  chatId: string;
+  ownerId: string;
 }
 
 export default function Header({
   setIsSelectorVisible,
   isChatActive,
-  setIsChatActive
+  setIsChatActive,
 }: HeaderProps) {
   const { id } = useParams<{ id: string }>();
   const [isOwner, setIsOwner] = useState<boolean>(false);
@@ -33,21 +43,25 @@ export default function Header({
   const [project, setProject] = useState<IProject | null>(null);
 
   useEffect(() => {
-    const token = cookies["test-cookies"];
-    if(token === undefined) return;
-    const decoded = jwtDecode(token) as ICookieInfo;
-    if (decoded.userId == project?.ownerId) setIsOwner(true);
+    // const token = cookies["test-cookies"];
+    // if (token === undefined) return;
+    // const decoded = jwtDecode(token) as ICookieInfo;
+    const userId = localStorage.getItem("userId");
+    if (userId == project?.ownerId) setIsOwner(true);
     else setIsOwner(false);
     //setProject(projectInfo)
   }, [project]);
 
   useEffect(() => {
     const getProjectInfo = async (id: string) => {
-      const response = await fetch(`http://localhost:5000/api/project/${id}/header`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-      });
+      const response = await fetch(
+        `http://localhost:5000/api/project/${id}/header`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
       const data = await response.json();
       console.log(data);
       setProject(data);
@@ -56,12 +70,28 @@ export default function Header({
   }, [id]);
 
   return (
-    <div className={styles.container}>
+    <div
+      style={{ 
+        margin: 0,
+        padding: "20px 10px",
+        borderBottom: "1px solid rgba(1, 1, 1, 0.1)",
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-evenly",
+        alignItems: "center",
+        width: `${isChatActive ? "calc(100% - 21vw)" : "100%"}`,
+        transition: "all .3s ease-out",
+        fontWeight: "500"
+      }}
+    >
       <h2 style={{ fontFamily: "inherit", margin: "10px" }}>
         {/* {project && project.owner?.username} / {project && project.name} */}
         {project && project.name}
       </h2>
-      <div className={styles.chatButton} onClick={() => setIsChatActive(!isChatActive)}>
+      <div
+        className={styles.chatButton}
+        onClick={() => setIsChatActive(!isChatActive)}
+      >
         <h3>Чат проекта</h3>
       </div>
       <Link
@@ -80,22 +110,23 @@ export default function Header({
       ) : (
         <div></div>
       )}
-      <Drawer
-        anchor={"right"}
+      <Sheet
+        key={"right"}
         open={isChatActive}
-        variant="persistent"
-        transitionDuration={300}
-        sx={{maxWidth: "40vw", '& .MuiPaper-root': { boxShadow: '-1vw 0px 15px #F4F6F8'}, }}
-        onClose={() => {}}
-        // sx={{ maxWidth: "40vw" }}
+        modal={false}
       >
-        <Chat
-          isActive={isChatActive}
-          onClose={() => setIsChatActive(false)}
-          chatId={project?.chatId}
-          projectName={project?.name}
-        />
-      </Drawer>
+        <SheetContent
+          className="h-screen top-0 right-0 left-auto mt-0 w-[400px] rounded-none"
+          side={"right"}
+        >
+          <Chat
+            isActive={isChatActive}
+            setIsChatActive={setIsChatActive}
+            chatId={project?.chatId}
+            projectName={project?.name}
+          />
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

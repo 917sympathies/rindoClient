@@ -34,6 +34,7 @@
     color: rgb(114, 115, 118);
     overflow: hidden;
     border-radius: 2rem;
+    width: 100%;
     display: flex;
     justify-content: center;
     margin-top: 1rem;

@@ -8,12 +8,14 @@ import {
   useCallback,
 } from "react";
 import { ITask, IUser } from "@/types";
-import { Modal, Avatar } from "@mui/material";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Avatar } from "@/components/ui/avatar";
 import { MessageCircle } from "lucide-react";
 import TaskModal from "./taskModal";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { PencilLine } from "lucide-react";
+// import { Avatar } from "@/components/ui/avatar";
 
 interface ITaskProps {
   task: ITask;
@@ -158,15 +160,19 @@ function Task({ task, setFetch }: ITaskProps) {
                 }}
               >
                 <Avatar
-                  sx={{
-                    bgcolor: "#4198FF",
+                  style={{
+                    backgroundColor: "#4198FF",
+                    color: "white",
                     width: "2.5vh",
                     height: "2.5vh",
                     fontSize: "0.6rem",
                     margin: "0.1rem",
                     marginLeft: "0.4rem",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center"
                   }}
-                  src="/static/images/avatar/1.jpg"
+                  // src="/static/images/avatar/1.jpg"
                 >
                   {responsibleUser?.firstName?.slice(0, 1)}
                   {responsibleUser?.lastName?.slice(0, 1)}
@@ -200,23 +206,23 @@ function Task({ task, setFetch }: ITaskProps) {
           </div>
         </div>
       </div>
-      <Modal
-        open={searchParams.has("task")}
-        onClose={() => setIsModalOpen(false)}
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignSelf: "center",
-          alignContent: "center",
-        }}
+      <Dialog
+        open={searchParams.get("task") === task.id}
+        // onClose={() => setIsModalOpen(false)}
+        // style={{
+        //   display: "flex",
+        //   justifyContent: "center",
+        //   alignSelf: "center",
+        //   alignContent: "center",
+        // }}
       >
-        <div>
+        <DialogContent style={{width: "140vh"}}>
           <TaskModal
             onClose={() => router.push(pathname + "?" + handleOpenModal(false))}
             setFetch={setFetch}
           />
-        </div>
-      </Modal>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

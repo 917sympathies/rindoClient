@@ -64,8 +64,29 @@ export interface ITaskComment{
 }
 
 export interface IRole {
-
+    id: string,
+    name: string,
+    canAddRoles: boolean,
+    canAddStage: boolean,
+    canAddTask: boolean,
+    canCompleteTask: boolean,
+    canDeleteStage: boolean,
+    canDeleteTask: boolean,
+    canExcludeUser: boolean,
+    canInviteUser: boolean,
+    canModifyRoles: boolean,
+    canModifyStage: boolean,
+    canModifyTask: boolean,
+    canUseChat: boolean,
 }
+
+export interface IUserRights{
+    canAddTask: boolean,
+    canUseChat: boolean,
+    canAddStage: boolean,
+    canDeleteStage: boolean,
+    canDeleteTask: boolean,
+  }
 
 export interface IStage {
     id: string,

@@ -6,7 +6,7 @@ import Header from "@/components/header";
 import Link from "next/link";
 import { usePathname, useParams } from "next/navigation";
 import { Kanban, GanttChart, TableProperties } from "lucide-react";
-import { Modal } from "@mui/material";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import AddUserModal from "@/components/addUserModal";
 
 interface Props {
@@ -47,7 +47,7 @@ export default function Layout({ children }: Props) {
   //   setProject(data);
   // };
   return (
-    <div style={{ display: "flex", flexDirection: "column", width: `${isChatActive ? 'calc(100% - 21vw)' : '100%'}`,transition: 'all .3s ease-out' }}>
+    <div style={{ display: "flex", flexDirection: "column", width: `${false ? 'calc(100% - 21vw)' : '100%'}`,transition: 'all .3s ease-out' }}>
       <Header setIsSelectorVisible={setIsSelectorVisible} isChatActive={isChatActive} setIsChatActive={setIsChatActive}/>
       {isSelectorVisible ? (
         <div
@@ -56,6 +56,7 @@ export default function Layout({ children }: Props) {
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
+            width: `${isChatActive ? 'calc(100% - 21vw)' : '100%'}`,transition: 'all .3s ease-out'
           }}
         >
           <div className={styles.selector}>
@@ -130,8 +131,13 @@ export default function Layout({ children }: Props) {
       ) : (
         <div></div>
       )}
-      <div>
-        <Modal
+      {/* <div> */}
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogContent>
+            <AddUserModal onClose={() => setIsModalOpen(false)} />
+          </DialogContent>
+        </Dialog>
+        {/* <Modal
           open={isModalOpen}
           sx={{
             display: "flex",
@@ -141,8 +147,8 @@ export default function Layout({ children }: Props) {
           }}
         >
           <AddUserModal onClose={() => setIsModalOpen(false)} />
-        </Modal>
-      </div>
+        </Modal> */}
+      {/* </div> */}
       {children}
     </div>
   );

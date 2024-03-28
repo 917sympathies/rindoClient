@@ -1,20 +1,36 @@
+"use client";
 import styles from "./styles.module.css";
 import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { ITask, ITaskComment, IUser, IUserInfo, ICookieInfo } from "@/types";
+import { Button } from "@/components/ui/button";
 import {
-  Button,
-  Typography,
-  InputLabel,
   Select,
-  MenuItem,
-  Modal,
-  InputBase,
-} from "@mui/material";
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectValue,
+  SelectTrigger,
+} from "@/components/ui/select";
+import { Avatar } from "@/components/ui/avatar";
+import { ArrowDown } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogOverlay,
+  DialogPortal,
+} from "@/components/ui/dialog";
 import { X, Send } from "lucide-react";
-//import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { cn } from "@/lib/utils";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import dayjs from "dayjs";
 import Editor from "@/components/editor";
 import {
@@ -25,13 +41,7 @@ import {
 } from "@microsoft/signalr";
 import { jwtDecode } from "jwt-decode";
 import { useCookies } from "react-cookie";
-
-// const CustomEditor = dynamic(
-//   () => {
-//     return import("../../../editor/CustomEditor");
-//   },
-//   { ssr: false }
-// );
+import { Input } from "@/components/ui/input";
 
 interface ITaskModalProps {
   onClose: () => void;
@@ -55,8 +65,8 @@ const TaskModal = ({ onClose, setFetch }: ITaskModalProps) => {
   const [status, setStatus] = useState<IStageDto>();
   const [desc, setDesc] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [finishDate, setFinishDate] = useState<string | null>(null);
-  const [startDate, setStartDate] = useState<string | null>(null);
+  const [finishDate, setFinishDate] = useState<string>(dayjs().format("YYYY-MM-DD"));
+  const [startDate, setStartDate] = useState<string>(dayjs().format("YYYY-MM-DD"));
   const [isModified, setIsModified] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -86,8 +96,8 @@ const TaskModal = ({ onClose, setFetch }: ITaskModalProps) => {
     }
     setDesc(currentTask.description);
     if (currentTask.comments) setTaskComments(currentTask.comments);
-    setStartDate(currentTask.startDate);
-    setFinishDate(currentTask.finishDate);
+    setStartDate(dayjs(currentTask.startDate).format("YYYY-MM-DD"));
+    setFinishDate(dayjs(currentTask.finishDate).format("YYYY-MM-DD"));
   }, [currentTask]);
 
   useEffect(() => {
@@ -100,10 +110,11 @@ const TaskModal = ({ onClose, setFetch }: ITaskModalProps) => {
   }, [statusList]);
 
   const getUserId = () => {
-    const token = cookies["test-cookies"];
-    if (!token) return;
-    const decoded = jwtDecode(token) as ICookieInfo;
-    setCurrentUserId(decoded.userId);
+    // const token = cookies["test-cookies"];
+    // if (!token) return;
+    // const decoded = jwtDecode(token) as ICookieInfo;
+    const userId = localStorage.getItem("userId");
+    setCurrentUserId(userId);
   };
 
   const handleChangeFinishDate = async (date: any) => {
@@ -270,8 +281,8 @@ const TaskModal = ({ onClose, setFetch }: ITaskModalProps) => {
             margin: "0.4rem",
           }}
         >
-          <Typography
-            sx={{
+          <Label
+            style={{
               color: "black",
               fontSize: "2rem",
               flexGrow: "5",
@@ -279,7 +290,7 @@ const TaskModal = ({ onClose, setFetch }: ITaskModalProps) => {
             }}
           >
             {currentTask?.name}
-          </Typography>
+          </Label>
           <X
             onClick={() => {
               onClose();
@@ -296,16 +307,16 @@ const TaskModal = ({ onClose, setFetch }: ITaskModalProps) => {
           }}
         >
           <div style={{ width: "80%", margin: "1rem 3rem" }}>
-            <Typography
-              sx={{
+            <Label
+              style={{
                 color: "black",
                 fontSize: "2rem",
                 flexGrow: "5",
-                textAlign: "flex-start",
+                // textAlign: "flex-start",
               }}
             >
               Описание
-            </Typography>
+            </Label>
             <Editor desc={desc} setDesc={setDesc} />
             {/* <CustomEditor
               initialData={currentTask?.description}
@@ -320,30 +331,69 @@ const TaskModal = ({ onClose, setFetch }: ITaskModalProps) => {
                 margin: "1rem 3rem",
                 display: "flex",
                 flexDirection: "row",
-                borderBottom: "1px solid rgba(1, 1, 1, 0.1)",
+                // borderBottom: "1px solid rgba(1, 1, 1, 0.1)",
                 alignItems: "center",
                 justifyContent: "space-between",
               }}
             >
-              <InputLabel
+              {/* <Label
                 id="responsibleinput"
                 style={{ color: "black", marginRight: "1rem" }}
               >
                 Исполнитель
-              </InputLabel>
+              </Label> */}
               <Select
-                labelId="responsibleinput"
-                className={styles.select}
+                // className={styles.select}
                 value={responsibleUser.username}
               >
-                <MenuItem
-                  key={responsibleUser.id}
-                  value={responsibleUser.username}
-                >
-                  {responsibleUser.username !== "Все"
-                    ? responsibleUser.lastName + " " + responsibleUser.firstName
-                    : "Все"}
-                </MenuItem>
+                <SelectTrigger>
+                  <SelectValue placeholder="Выберите"></SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem
+                    key={responsibleUser.id}
+                    value={responsibleUser.username}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 8,
+                      }}
+                    >
+                      {responsibleUser.username !== "Все" ? (
+                        <Avatar
+                          style={{
+                            backgroundColor: "#4198FF",
+                            color: "white",
+                            width: "2.5vh",
+                            height: "2.5vh",
+                            fontSize: "0.6rem",
+                            margin: "0.1rem",
+                            marginLeft: "0.4rem",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                          // src="/static/images/avatar/1.jpg"
+                        >
+                          {responsibleUser?.firstName?.slice(0, 1)}
+                          {responsibleUser?.lastName?.slice(0, 1)}
+                        </Avatar>
+                      ) : (
+                        <div></div>
+                      )}
+                      <div>
+                        {responsibleUser.username !== "Все"
+                          ? responsibleUser.lastName +
+                            " " +
+                            responsibleUser.firstName
+                          : "Все"}
+                      </div>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
               </Select>
             </div>
             <div
@@ -353,35 +403,122 @@ const TaskModal = ({ onClose, setFetch }: ITaskModalProps) => {
                 margin: "1rem 3rem",
                 display: "flex",
                 flexDirection: "row",
-                borderBottom: "1px solid rgba(1, 1, 1, 0.1)",
+                // borderBottom: "1px solid rgba(1, 1, 1, 0.1)",
                 alignItems: "center",
                 justifyContent: "space-between",
               }}
             >
-              <InputLabel
+              {/* <Label
                 id="statusinput"
                 style={{ color: "black", marginRight: "1rem" }}
               >
                 Статус
-              </InputLabel>
+              </Label> */}
               <Select
-                labelId="statusinput"
-                className={styles.select}
-                placeholder="Выберите"
+                // className={styles.select}
+                // placeholder="Выберите"
                 value={status?.name || ""}
-                onChange={(e) => handleChangeStage(e.target.value)}
+                onValueChange={(value) => handleChangeStage(value)}
+                // onChange={(e) => handleChangeStage(e.target.value)}
               >
-                {statusList &&
-                  statusList?.map((status) => (
-                    <MenuItem key={status.id} value={status.name}>
-                      {status.name}
-                    </MenuItem>
-                  ))}
+                {/* <SelectValue placeholder="Выберите" ></SelectValue> */}
+                <SelectTrigger className="SelectTrigger" aria-label="Food">
+                  <SelectValue placeholder="Выберите стадию" />
+                </SelectTrigger>
+                <SelectContent>
+                  {statusList &&
+                    statusList?.map((status) => (
+                      <SelectItem
+                        key={status.id}
+                        value={status.name.toString()}
+                      >
+                        {status.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
               </Select>
             </div>
           </div>
-          <div>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <div style={{ display: "flex", flexDirection: "row" }}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                margin: "1rem 3rem",
+                padding: "0.6rem 0",
+                width: "40%",
+              }}
+            >
+              <Label style={{ marginBottom: "0.2rem" }}>Начало</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[240px] justify-start text-left font-normal w-full",
+                      !startDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {startDate ? (
+                      dayjs(startDate).format("YYYY-MM-DD")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={new Date(startDate)}
+                    onSelect={(value) =>
+                      setStartDate(dayjs(value).format("YYYY-MM-DD"))
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                margin: "1rem 3rem",
+                padding: "0.6rem 0",
+                width: "40%",
+              }}
+            >
+              <Label style={{ marginBottom: "0.2rem" }}>Конец</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[240px] justify-start text-left font-normal w-full",
+                      !finishDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {startDate ? (
+                      dayjs(finishDate).format("YYYY-MM-DD")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={new Date(finishDate)}
+                    onSelect={(value) =>
+                      setFinishDate(dayjs(value).format("YYYY-MM-DD"))
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
               <div
                 style={{
                   display: "flex",
@@ -400,12 +537,12 @@ const TaskModal = ({ onClose, setFetch }: ITaskModalProps) => {
                     borderBottom: "1px solid rgba(1, 1, 1, 0.1)",
                   }}
                 >
-                  <InputLabel
+                  <Label
                     id="statusinput"
                     style={{ color: "black", marginRight: "1rem" }}
                   >
                     Дата начала
-                  </InputLabel>
+                  </Label>
                   <DatePicker
                     label={"Выберите начало"}
                     format="YYYY-MM-DD"
@@ -428,12 +565,12 @@ const TaskModal = ({ onClose, setFetch }: ITaskModalProps) => {
                     borderBottom: "1px solid rgba(1, 1, 1, 0.1)",
                   }}
                 >
-                  <InputLabel
+                  <Label
                     id="statusinput"
                     style={{ color: "black", marginRight: "1rem" }}
                   >
                     Дата начала
-                  </InputLabel>
+                  </Label>
                   <DatePicker
                     label={"Выберите конец"}
                     format="YYYY-MM-DD"
@@ -445,7 +582,7 @@ const TaskModal = ({ onClose, setFetch }: ITaskModalProps) => {
                   />
                 </div>
               </div>
-            </LocalizationProvider>
+            </LocalizationProvider> */}
           </div>
           <div
             style={{
@@ -456,17 +593,19 @@ const TaskModal = ({ onClose, setFetch }: ITaskModalProps) => {
             }}
           >
             <Button
-              style={
-                isModified
-                  ? { border: "1px solid #1976d2" }
-                  : { visibility: "hidden" }
-              }
+              className={isModified ? "border border-green-500 bg-white text-green-500 hover:bg-green-500 hover:text-white ease-in-out duration-300" : "invisible"}
+              // style={
+              //   isModified
+              //     ? { border: "1px solid #1976d2" }
+              //     : { visibility: "hidden" }
+              // }
               onClick={() => handleSaveChanges()}
             >
               Применить
             </Button>
             <Button
-              style={{ color: "red", border: "1px solid red" }}
+              className="bg-white text-red-700 border border-red-700 hover:bg-red-500 hover:text-white"
+              // style={{ color: "red", border: "1px solid red" }}
               onClick={() => setIsModalOpen(true)}
             >
               Удалить
@@ -474,50 +613,54 @@ const TaskModal = ({ onClose, setFetch }: ITaskModalProps) => {
           </div>
         </div>
       </div>
-      <Modal
+      <Dialog
         open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignSelf: "center",
-          alignContent: "center",
-        }}
+        onOpenChange={setIsModalOpen}
+        // onClose={() => setIsModalOpen(false)}
+        // style={{
+        //   display: "flex",
+        //   justifyContent: "center",
+        //   alignSelf: "center",
+        //   alignContent: "center",
+        // }}
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            backgroundColor: "white",
-            width: "20%",
-            borderRadius: "8px",
-            padding: "10px",
-          }}
-        >
-          <Typography sx={{ color: "black", alignSelf: "center" }}>
-            Вы действительно хотите удалить задачу?
-          </Typography>
-          <div style={{ display: "flex", alignSelf: "center" }}>
-            <Button
-              onClick={() => handleDelete()}
-              sx={{
-                color: "white",
-                backgroundColor: "green",
-                marginRight: "0.4rem",
-              }}
-            >
-              Да
-            </Button>
-            <Button
-              onClick={() => setIsModalOpen(false)}
-              sx={{ color: "white", backgroundColor: "red" }}
-            >
-              Нет
-            </Button>
+        <DialogContent className="sm:max-w-[425px]">
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              backgroundColor: "white",
+              width: "100%",
+              gap: 8,
+              borderRadius: "8px",
+              padding: "10px",
+            }}
+          >
+            <Label style={{ color: "black", alignSelf: "center" }}>
+              Вы действительно хотите удалить задачу?
+            </Label>
+            <div style={{ display: "flex", alignSelf: "center" }}>
+              <Button
+                onClick={() => handleDelete()}
+                style={{
+                  color: "white",
+                  backgroundColor: "green",
+                  marginRight: "0.4rem",
+                }}
+              >
+                Да
+              </Button>
+              <Button
+                onClick={() => setIsModalOpen(false)}
+                style={{ color: "white", backgroundColor: "red" }}
+              >
+                Нет
+              </Button>
+            </div>
           </div>
-        </div>
-      </Modal>
+        </DialogContent>
+      </Dialog>
       <div className={styles.chat}>
         <div className={styles.container}>
           <div
@@ -528,13 +671,13 @@ const TaskModal = ({ onClose, setFetch }: ITaskModalProps) => {
               justifyContent: "space-between",
             }}
           >
-            <Typography
-              sx={{
+            <Label
+              style={{
                 fontSize: "1.2rem",
                 marginLeft: "2rem",
                 color: "rgb(114, 115, 118)",
               }}
-            >{`Комментарии`}</Typography>
+            >{`Комментарии`}</Label>
             <X onClick={onClose} className={styles.closeBtn} />
           </div>
           <div
@@ -562,8 +705,8 @@ const TaskModal = ({ onClose, setFetch }: ITaskModalProps) => {
                   //   }`,
                   // }}
                   >
-                    <Typography
-                      sx={{
+                    <Label
+                      style={{
                         textAlign: "center",
                         fontSize: ".8rem",
                         color: "#87888C",
@@ -571,7 +714,7 @@ const TaskModal = ({ onClose, setFetch }: ITaskModalProps) => {
                       }}
                     >
                       {/* {message ? moment(message.createdAt).format("DD.MM") : ""} */}
-                    </Typography>
+                    </Label>
                   </div>
                   <div
                     style={{
@@ -594,29 +737,27 @@ const TaskModal = ({ onClose, setFetch }: ITaskModalProps) => {
                           alignItems: "baseline",
                         }}
                       >
-                        <Typography
-                          variant="body2"
-                          fontWeight="500"
-                          sx={{
+                        <Label
+                          style={{
                             textTransform: "capitalize",
+                            fontWeight: "500",
                             fontSize: ".9rem",
                             color: "white",
                           }}
                         >
                           {message.content}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          fontWeight="500"
-                          sx={{
+                        </Label>
+                        <Label
+                          style={{
                             textTransform: "capitalize",
                             fontSize: ".6rem",
+                            fontWeight: "500",
                             color: "white",
-                            ml: ".5rem",
+                            marginLeft: ".5rem",
                           }}
                         >
                           {/* {moment(message.createdAt).format("HH:mm")} */}
-                        </Typography>
+                        </Label>
                       </div>
                     </div>
                   </div>
@@ -635,8 +776,8 @@ const TaskModal = ({ onClose, setFetch }: ITaskModalProps) => {
                   //   }`,
                   // }}
                   >
-                    <Typography
-                      sx={{
+                    <Label
+                      style={{
                         textAlign: "center",
                         fontSize: ".8rem",
                         color: "#87888C",
@@ -644,7 +785,7 @@ const TaskModal = ({ onClose, setFetch }: ITaskModalProps) => {
                       }}
                     >
                       {/* {message ? moment(message.createdAt).format("DD.MM") : ""} */}
-                    </Typography>
+                    </Label>
                   </div>
                   <div
                     style={{
@@ -660,9 +801,9 @@ const TaskModal = ({ onClose, setFetch }: ITaskModalProps) => {
                         borderRadius: ".6rem",
                       }}
                     >
-                      <Typography color={"#87888C"} sx={{ fontSize: ".7rem" }}>
+                      <Label color={"#87888C"} style={{ fontSize: ".7rem" }}>
                         {message.username}
-                      </Typography>
+                      </Label>
                       <div
                         style={{
                           display: "flex",
@@ -670,29 +811,27 @@ const TaskModal = ({ onClose, setFetch }: ITaskModalProps) => {
                           alignItems: "baseline",
                         }}
                       >
-                        <Typography
-                          variant="body2"
-                          fontWeight="500"
-                          sx={{
+                        <Label
+                          style={{
                             textTransform: "capitalize",
+                            fontWeight: "500",
                             fontSize: ".9rem",
                             color: "black",
                           }}
                         >
                           {message.content}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          fontWeight="500"
-                          sx={{
+                        </Label>
+                        <Label
+                          style={{
                             textTransform: "capitalize",
+                            fontWeight: "500",
                             fontSize: ".6rem",
                             color: "black",
-                            ml: ".9rem",
+                            marginLeft: ".9rem",
                           }}
                         >
                           {/* {moment(message.createdAt).format("HH:mm")} */}
-                        </Typography>
+                        </Label>
                       </div>
                     </div>
                   </div>
@@ -711,12 +850,13 @@ const TaskModal = ({ onClose, setFetch }: ITaskModalProps) => {
                 alignItems: "center",
                 margin: ".5rem 0 1vh 0",
                 width: "80%",
+                gap: 8,
               }}
             >
-              <InputBase
-                sx={{ flex: 1, fontSize: ".9rem" }}
+              <Input
+                style={{ flex: 1, fontSize: ".9rem" }}
                 placeholder="Написать сообщение..."
-                inputProps={{ "aria-label": "Написать сообщение..." }}
+                // inputProps={{ "aria-label": "Написать сообщение..." }}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
               />

@@ -1,7 +1,9 @@
 import styles from "./styles.module.css";
 import {useState, Dispatch, SetStateAction} from 'react'
-import { IStage } from "@/types";
-import { Button, Modal, Typography } from "@mui/material";
+import { IStage, IUserRights } from "@/types";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { Droppable, Draggable } from "react-beautiful-dnd";
 import Task from "../task";
 import { TurnOffDefaultPropsWarning } from "@/components/turnOffDefaultPropsWarning";
@@ -12,9 +14,10 @@ interface IStageProps {
   handleDeleteStage: (id: string) => void;
   onClick: () => void;
   setFetch: Dispatch<SetStateAction<boolean>>;
+  rights: IUserRights
 }
 
-export default function Stage({ stage, onClick, handleDeleteStage, setFetch }: IStageProps) {
+export default function Stage({ stage, onClick, handleDeleteStage, setFetch, rights }: IStageProps) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const handleDelete = async () => {
@@ -28,12 +31,15 @@ export default function Stage({ stage, onClick, handleDeleteStage, setFetch }: I
         <p style={{ margin: "0", display: "flex", justifyContent: "center" }}>
           {stage.name}
         </p>
-        <X className={styles.closeBtn} size={16} onClick={() => setIsModalOpen(true)}/>
+        {rights.canDeleteStage ? 
+        <X className={styles.closeBtn} size={24} onClick={() => setIsModalOpen(true)}/> : <></> }
       </div>
       <div style={{ flexGrow: "20", width: "90%", margin: "8px 0px" }}>
+        {rights.canAddTask ? 
         <Button className={styles.addbutton} onClick={onClick}>
           <Plus style={{ color: "inherit" }} size={16}/>
         </Button>
+        : <div></div> }
         <Droppable key={stage.name} droppableId={stage.id}>
           {(provided) => (
             <div
@@ -54,7 +60,7 @@ export default function Stage({ stage, onClick, handleDeleteStage, setFetch }: I
                         {/* <Modal
                           open={isModalOpen}
                           onClose={() => setIsModalOpen(false)}
-                          sx={{
+                          style={{
                             display: "flex",
                             justifyContent: "center",
                             alignSelf: "center",
@@ -75,34 +81,38 @@ export default function Stage({ stage, onClick, handleDeleteStage, setFetch }: I
           )}
         </Droppable>
       </div>
-      <Modal
+      <Dialog
         open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignSelf: "center",
-          alignContent: "center",
-        }}
+        // onClose={() => setIsModalOpen(false)}
+        // style={{
+        //   display: "flex",
+        //   justifyContent: "center",
+        //   alignSelf: "center",
+        //   alignContent: "center",
+        // }}
       >
+        <DialogContent>
         <div
+          className="gap-4"
           style={{
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
+            alignItems: "center",
             backgroundColor: "white",
-            width: "20%",
+            width: "100%",
+            minHeight: "6rem",
             borderRadius: "8px",
             padding: "10px",
           }}
         >
-          <Typography sx={{ color: "black", alignSelf: "center" }}>
+          <Label style={{ color: "black", alignSelf: "center" }}>
             Вы действительно хотите удалить стадию?
-          </Typography>
+          </Label>
           <div style={{ display: "flex", alignSelf: "center" }}>
             <Button
               onClick={() => handleDeleteStage(stage.id)}
-              sx={{
+              style={{
                 color: "white",
                 backgroundColor: "green",
                 marginRight: "0.4rem",
@@ -112,13 +122,14 @@ export default function Stage({ stage, onClick, handleDeleteStage, setFetch }: I
             </Button>
             <Button
               onClick={() => setIsModalOpen(false)}
-              sx={{ color: "white", backgroundColor: "red" }}
+              style={{ color: "white", backgroundColor: "red" }}
             >
               Нет
             </Button>
           </div>
         </div>
-      </Modal>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

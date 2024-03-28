@@ -9,10 +9,9 @@ import {
   useSearchParams,
 } from "next/navigation";
 import { useState, useEffect } from "react";
+import { Avatar } from "../ui/avatar";
+import { Dialog, DialogContent } from "../ui/dialog";
 import TaskModal from "../kanban/task/taskModal";
-import Modal from "@mui/material/Modal/Modal";
-// import { TextareaAutosize } from '@mui/base';
-import Avatar from "@mui/material/Avatar/Avatar";
 import { Trash2, PencilLine } from "lucide-react";
 
 interface TaskListProps {}
@@ -144,7 +143,7 @@ export default function TaskList({}: TaskListProps) {
                     router.push(pathname + "?" + handleOpenModal(task.id))
                   }
                 />
-                <Trash2 className={styles.btn} size={16} />
+                {/* <Trash2 className={styles.btn} size={16} /> */}
               </div>
             </div>
           ))
@@ -157,23 +156,30 @@ export default function TaskList({}: TaskListProps) {
         )}
       </div>
       <div>
-        <Modal
+        <Dialog
           open={searchParams.has("task")}
-          onClose={() => {}}
-          sx={{
+          // onClose={() => {}}
+          // style={{
+          //   display: "flex",
+          //   justifyContent: "center",
+          //   alignSelf: "center",
+          //   alignContent: "center",
+          // }}
+        >
+          <DialogContent>
+          <div style={{
             display: "flex",
             justifyContent: "center",
             alignSelf: "center",
             alignContent: "center",
-          }}
-        >
-          <div>
+          }}>
             <TaskModal
               onClose={() => router.push(pathname + "?" + handleOpenModal())}
               setFetch={setFetch}
             ></TaskModal>
           </div>
-        </Modal>
+          </DialogContent>
+        </Dialog>
       </div>
     </>
   );

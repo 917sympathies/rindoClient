@@ -2,7 +2,6 @@ import styles from "./styles.module.css";
 import type { PropsWithChildren } from "react";
 import Sidebar from "@/components/sidebar";
 // import { useState, useEffect } from "react";
-// import Drawer from "@mui/material/Drawer/Drawer";
 // import AddProjectModal from "@/components/addProjectModal";
 // import { useCookies } from "react-cookie";
 // import { jwtDecode } from "jwt-decode";

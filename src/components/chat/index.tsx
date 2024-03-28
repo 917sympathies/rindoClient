@@ -1,9 +1,10 @@
 "use client";
 import styles from "./styles.module.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { X } from "lucide-react";
-import { Typography, TextField, Box, InputBase } from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import { Send } from "lucide-react";
 import { IChat, IUserInfo, IMessage, ICookieInfo } from "@/types";
 import { jwtDecode } from "jwt-decode";
 import { useCookies } from "react-cookie";
@@ -18,12 +19,12 @@ interface ChatProps {
   chatId: string | undefined;
   projectName: string | undefined;
   isActive: boolean;
-  onClose: () => void;
+  setIsChatActive: Dispatch<SetStateAction<boolean>>
 }
 
 export default function Chat({
   isActive,
-  onClose,
+  setIsChatActive,
   chatId,
   projectName,
 }: ChatProps) {
@@ -47,11 +48,12 @@ export default function Chat({
       setChatMessages(data.value.messages)
     };
     const getUserInfo = async () => {
-      const token = cookies["test-cookies"];
-      if (!token) return;
-      const decoded = jwtDecode(token) as ICookieInfo;
+      // const token = cookies["test-cookies"];
+      // if (!token) return;
+      // const decoded = jwtDecode(token) as ICookieInfo;
+      const userId = localStorage.getItem("userId");
       const response = await fetch(
-        `http://localhost:5000/api/user/${decoded.userId}`,
+        `http://localhost:5000/api/user/${userId}`,
         {
           method: "GET",
           headers: { "Content-Type": "application/json" },
@@ -138,10 +140,10 @@ export default function Chat({
           justifyContent: "space-between",
         }}
       >
-        <Typography
-          sx={{ fontSize: "1.2rem", marginLeft: "2rem" }}
-        >{`Чат проекта ${projectName}`}</Typography>
-        <X onClick={onClose} className={styles.closeBtn} />
+        <Label
+          style={{ fontSize: "1.2rem", marginLeft: "2rem" }}
+        >{`Чат проекта ${projectName}`}</Label>
+        <X onClick={() => setIsChatActive(false)} className={styles.closeBtn} />
       </div>
       <div>
         <div
@@ -169,8 +171,8 @@ export default function Chat({
                 //   }`,
                 // }}
                 >
-                  <Typography
-                    sx={{
+                  <Label
+                    style={{
                       textAlign: "center",
                       fontSize: ".8rem",
                       color: "#87888C",
@@ -178,7 +180,7 @@ export default function Chat({
                     }}
                   >
                     {/* {message ? moment(message.createdAt).format("DD.MM") : ""} */}
-                  </Typography>
+                  </Label>
                 </div>
                 <div
                   style={{
@@ -201,30 +203,27 @@ export default function Chat({
                         alignItems: "baseline",
                       }}
                     >
-                      <Typography
-                        variant="body2"
-                        fontWeight="500"
-                        sx={{
+                      <Label
+                        style={{
                           textTransform: "capitalize",
                           fontSize: ".9rem",
+                          fontWeight: "500",
                           color: "white",
                         }}
-                        style={{color: "white"}}
                       >
                         {message.content}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        fontWeight="500"
-                        sx={{
+                      </Label>
+                      <Label
+                        style={{
                           textTransform: "capitalize",
+                          fontWeight: "500",
                           fontSize: ".6rem",
                           color: "white",
-                          ml: ".5rem",
+                          marginLeft: ".5rem",
                         }}
                       >
                         {/* {moment(message.createdAt).format("HH:mm")} */}
-                      </Typography>
+                      </Label>
                     </div>
                   </div>
                 </div>
@@ -243,8 +242,8 @@ export default function Chat({
                 //   }`,
                 // }}
                 >
-                  <Typography
-                    sx={{
+                  <Label
+                    style={{
                       textAlign: "center",
                       fontSize: ".8rem",
                       color: "#87888C",
@@ -252,7 +251,7 @@ export default function Chat({
                     }}
                   >
                     {/* {message ? moment(message.createdAt).format("DD.MM") : ""} */}
-                  </Typography>
+                  </Label>
                 </div>
                 <div
                   style={{
@@ -268,9 +267,9 @@ export default function Chat({
                       borderRadius: ".6rem",
                     }}
                   >
-                    <Typography color={"#87888C"} sx={{ fontSize: ".7rem" }} style={{color: "#87888C"}}>
+                    <Label color={"#87888C"} style={{ fontSize: ".7rem", color: "#87888C" }}>
                       {message.username}
-                    </Typography>
+                    </Label>
                     <div
                       style={{
                         display: "flex",
@@ -278,30 +277,27 @@ export default function Chat({
                         alignItems: "baseline",
                       }}
                     >
-                      <Typography
-                        variant="body2"
-                        fontWeight="500"
-                        sx={{
+                      <Label
+                        style={{
                           textTransform: "capitalize",
+                          fontWeight: "500",
                           fontSize: ".9rem",
                           color: "black",
                         }}
-                        style={{color: "black"}}
                       >
                         {message.content}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        fontWeight="500"
-                        sx={{
+                      </Label>
+                      <Label
+                        style={{
                           textTransform: "capitalize",
                           fontSize: ".6rem",
+                          fontWeight: "500",
                           color: "black",
-                          ml: ".9rem",
+                          marginLeft: ".9rem",
                         }}
                       >
                         {/* {moment(message.createdAt).format("HH:mm")} */}
-                      </Typography>
+                      </Label>
                     </div>
                   </div>
                 </div>
@@ -310,31 +306,32 @@ export default function Chat({
           )}
         </div>
       </div>
-      <div style={{ display: "flex", justifyContent: "center" }}>
+      <div style={{ display: "flex", justifyContent: "center", }}>
         <div
           style={{
             backgroundColor: "#ECF0F3",
-            padding: ".4rem .8rem",
+            padding: ".6rem .8rem",
             borderRadius: ".6rem",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
             margin: ".5rem 0 1vh 0",
+            gap: 14,
             width: "80%",
           }}
         >
-          <InputBase
-            sx={{ flex: 1, fontSize: ".9rem" }}
+          <Input
+            style={{ flex: 1, fontSize: ".9rem" }}
             placeholder="Написать сообщение..."
-            inputProps={{ "aria-label": "Написать сообщение..." }}
+            // inputProps={{ "aria-label": "Написать сообщение..." }}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
-          <SendIcon
-            sx={{
+          <Send
+            style={{
               fontSize: ".9rem",
               color: "rgba(102, 153, 255, 0.6)",
-              "&:hover": { color: "rgba(102, 153, 255, 0.3)" },
+              // "&:hover": { color: "rgba(102, 153, 255, 0.3)" },
             }}
             onClick={() => sendMessage()}
           />

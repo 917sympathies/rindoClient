@@ -33,6 +33,7 @@
 
 .addbutton{
     width: 90%; 
+    margin-top: 0.4rem;
     margin-bottom: 0.4rem; 
     color: black;
     background-color: rgba(102, 153, 255, 0.6); 

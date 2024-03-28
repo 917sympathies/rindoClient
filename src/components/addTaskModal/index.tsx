@@ -1,26 +1,28 @@
 "use client";
 import styles from "./styles.module.css";
-import { useState, useEffect, useRef, SetStateAction, Dispatch } from "react";
+import { useState, useEffect, SetStateAction, Dispatch } from "react";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 import {
-  Box,
-  Button,
   Select,
-  MenuItem,
-  Input,
-  InputBase,
-  TextField,
-  InputLabel,
-  Typography,
-  Avatar,
-} from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import ClearIcon from "@mui/icons-material/Clear";
-import CloseIcon from "@mui/icons-material/Close";
+  SelectItem,
+  SelectContent,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { cn } from "@/lib/utils";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Avatar } from "../ui/avatar";
+import { X } from "lucide-react";
 import React from "react";
-//import dynamic from "next/dynamic";
 import { IProject, ITask, IUser } from "@/types";
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { useParams } from "next/navigation";
 import { IUserInfo } from "@/types";
@@ -55,6 +57,7 @@ IAddTaskModalProps) => {
   const [startDate, setStart] = useState(dayjs().format("YYYY-MM-DD"));
   const [finishDate, setFinish] = useState(dayjs().format("YYYY-MM-DD"));
   const [users, setUsers] = useState<IUserInfo[] | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   useEffect(() => {
     setTask((prevState) => ({
@@ -81,7 +84,8 @@ IAddTaskModalProps) => {
   };
 
   const handleChangeResponsibleUser = (value: string) => {
-    setResponsibleUser(value);
+    if (value === "все") setResponsibleUser("");
+    else setResponsibleUser(value);
   };
 
   const handleChangeStartDate = (date: any) => {
@@ -97,6 +101,10 @@ IAddTaskModalProps) => {
   const handleAddTask = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
+    if (new Date(startDate) > new Date(finishDate)) {
+      setErrorMessage("Вы выбрали некорректные даты!");
+      return;
+    }
     const taskDto = {
       name: task.name,
       description: task.description,
@@ -138,10 +146,8 @@ IAddTaskModalProps) => {
             alignItems: "center",
           }}
         >
-          <Typography
-            variant="body2"
-            fontWeight="500"
-            sx={{
+          <Label
+            style={{
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -152,16 +158,16 @@ IAddTaskModalProps) => {
             }}
           >
             Задача
-          </Typography>
-          <CloseIcon
-            sx={{
+          </Label>
+          <X
+            style={{
               cursor: "pointer",
               borderRadius: "50%",
               fontSize: "1.2rem",
-              "&:hover": {
-                backgroundColor: "white",
-                transition: "all .1s ease-in-out",
-              },
+              // "&:hover": {
+              //   backgroundColor: "white",
+              //   transition: "all .1s ease-in-out",
+              // },
               padding: ".5vh",
               transition: "all .1s ease-in-out",
             }}
@@ -170,23 +176,22 @@ IAddTaskModalProps) => {
         </div>
         <div style={{ padding: "1rem 3rem" }}>
           <div style={{ marginBottom: ".5rem" }}>
-            <Typography
-              variant="body2"
-              fontWeight="500"
-              sx={{
+            <Label
+              style={{
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 textTransform: "capitalize",
                 fontSize: "0.9rem",
                 color: "black",
-                mb: ".5rem",
+                fontWeight: "500",
+                marginBottom: ".5rem",
                 fontFamily: "inherit",
               }}
             >
               Название задачи
-            </Typography>
-            <TextField
+            </Label>
+            <Input
               onChange={(event) => {
                 setTask((prevState) => ({
                   ...prevState,
@@ -194,17 +199,8 @@ IAddTaskModalProps) => {
                 }));
               }}
               placeholder="Без названия"
-              variant="outlined"
-              fullWidth
-              sx={{
+              style={{
                 width: "100%",
-                "& .MuiOutlinedInput-input": { padding: 0 },
-                "& .MuiOutlinedInput-notchedOutline": { border: "unset " },
-                "& .MuiOutlinedInput-root": {
-                  fontSize: "2.7rem",
-                  fontWeight: "700",
-                  fontFamily: "inherit",
-                },
               }}
             />
           </div>
@@ -217,8 +213,8 @@ IAddTaskModalProps) => {
             }}
           >
             {/* {project?.tags?.map((e, index) => (
-                      <Box sx={{padding: '.1rem .7rem', mr: '.3rem',  backgroundColor: `#F4F6F8`, borderRadius: '3vh', display: 'inline-flex', flexDirection: 'row',alignItems: 'center', justifyContent: 'space-between', width: '6rem'}}>
-                        <InputBase sx={{ fontSize: '.7rem', color: 'black', textTransform: 'capitalize', '& .MuiOutlinedInput-notchedOutline': { border: 'unset' }, '& .MuiOutlinedInput-input': { padding: 0 }, width: 'auto'}} value={e}
+                      <Box style={{padding: '.1rem .7rem', mr: '.3rem',  backgroundColor: `#F4F6F8`, borderRadius: '3vh', display: 'inline-flex', flexDirection: 'row',alignItems: 'center', justifyContent: 'space-between', width: '6rem'}}>
+                        <InputBase style={{ fontSize: '.7rem', color: 'black', textTransform: 'capitalize', '& .MuiOutlinedInput-notchedOutline': { border: 'unset' }, '& .MuiOutlinedInput-input': { padding: 0 }, width: 'auto'}} value={e}
                                    placeholder='Введите тег'
                                    onChange={(event) => {
                                      setProject(prevState => ({
@@ -231,7 +227,7 @@ IAddTaskModalProps) => {
                                      }))
                                    }}
                         />
-                        <ClearIcon sx={{color: 'black', fontSize: '.8rem', borderRadius: '50%', '&:hover': {backgroundColor: '#F4F6F8', cursor: 'pointer'}}}
+                        <ClearIcon style={{color: 'black', fontSize: '.8rem', borderRadius: '50%', '&:hover': {backgroundColor: '#F4F6F8', cursor: 'pointer'}}}
                                    onClick={() => {
                                      setProject(prevState => (
                                        {
@@ -253,8 +249,8 @@ IAddTaskModalProps) => {
                         //    }
                          }}
                     >
-                      <AddIcon sx={{color: 'black', fontSize: '.8rem', borderRadius: '50%', '&:hover': {backgroundColor: '#F4F6F8', cursor: 'pointer'}}}/>
-                      <Typography sx={{textTransform: 'lowercase', fontSize: '.8rem', color: 'black', ml: '.3rem'}}>Добавить тег</Typography>
+                      <AddIcon style={{color: 'black', fontSize: '.8rem', borderRadius: '50%', '&:hover': {backgroundColor: '#F4F6F8', cursor: 'pointer'}}}/>
+                      <Label style={{textTransform: 'lowercase', fontSize: '.8rem', color: 'black', ml: '.3rem'}}>Добавить тег</Label>
                     </div> */}
           </div>
           <div
@@ -264,23 +260,22 @@ IAddTaskModalProps) => {
               maxWidth: "calc(50vw - 6rem)",
             }}
           >
-            <Typography
-              variant="body2"
-              fontWeight="500"
-              sx={{
+            <Label
+              style={{
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 textTransform: "capitalize",
                 fontSize: "0.9rem",
+                fontWeight: "500",
                 color: "black",
-                mt: "1.5rem",
-                mb: ".5rem",
+                marginTop: "1.5rem",
+                marginBottom: ".5rem",
                 fontFamily: "inherit",
               }}
             >
               Описание задачи
-            </Typography>
+            </Label>
             <div
               style={{
                 position: "relative",
@@ -292,78 +287,153 @@ IAddTaskModalProps) => {
               {/* <div style={{width: "100%"}}>
                 <textarea className={styles.editor} value={desc} onChange={(e) => setDesc(e.target.value)}></textarea>
               </div> */}
-              <Editor desc={desc} setDesc={setDesc}/>
+              <Editor desc={desc} setDesc={setDesc} />
               {/* <CustomEditor
                 // initialData={desc}
                 setState={setDesc}
               /> */}
-              <InputLabel
+              <Label
                 id="responsibleinput"
                 style={{ marginTop: "10px", color: "black" }}
               >
                 Ответственный
-              </InputLabel>
+              </Label>
               <Select
-                labelId="responsibleinput"
-                className={styles.select}
+                // className={styles.select}
                 value={responsibleUser}
-                onChange={(e) => handleChangeResponsibleUser(e.target.value)}
+                onValueChange={(value) => handleChangeResponsibleUser(value)}
               >
-                {users &&
-                  users.map((user) => (
-                    <MenuItem key={user.username} value={user.id}>
-                      <Avatar
-                        sx={{
-                          bgcolor: "#4198FF",
-                          width: "4vh",
-                          height: "4vh",
-                          fontSize: "1rem",
-                          marginRight: "0.4rem",
-                        }}
-                        src="/static/images/avatar/1.jpg"
-                      >
-                        {user?.firstName?.slice(0, 1)}
-                        {user?.lastName?.slice(0, 1)}
-                      </Avatar>
-                      {user.firstName +
-                        " " +
-                        user.lastName +
-                        " (" +
-                        user.username +
-                        ")"}
-                    </MenuItem>
-                  ))}
+                <SelectTrigger className="SelectTrigger" aria-label="Food">
+                  <SelectValue placeholder="Все" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem style={{ paddingLeft: "2.5rem" }} value={"все"}>
+                    Все
+                  </SelectItem>
+                  {users &&
+                    users.map((user) => (
+                      <SelectItem key={user.username} value={user.id}>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            gap: 8,
+                          }}
+                        >
+                          <Avatar
+                            style={{
+                              backgroundColor: "#4198FF",
+                              color: "white",
+                              width: "2.5vh",
+                              height: "2.5vh",
+                              fontSize: "0.6rem",
+                              margin: "0.1rem",
+                              marginLeft: "0.4rem",
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                            }}
+                            // src="/static/images/avatar/1.jpg"
+                          >
+                            {user?.firstName?.slice(0, 1)}
+                            {user?.lastName?.slice(0, 1)}
+                          </Avatar>
+                          <div>
+                            {user.firstName +
+                              " " +
+                              user.lastName +
+                              " (" +
+                              user.username +
+                              ")"}
+                          </div>
+                        </div>
+                      </SelectItem>
+                    ))}
+                </SelectContent>
               </Select>
             </div>
           </div>
-          <div style={{ marginTop: "1rem" }}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                <div style={{ marginBottom: "0.8rem" }}>
-                  <DatePicker
-                    label={"Выберите дату начала проекта"}
-                    defaultValue={dayjs()}
-                    onChange={(date) => {
-                      if (date != null) handleChangeStartDate(date);
-                    }}
+          <div style={{
+              marginTop: "1rem",
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+            }}>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+              <Label style={{ marginBottom: "0.2rem" }}>Начало</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[240px] justify-start text-left font-normal",
+                      !startDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {startDate ? (
+                      dayjs(startDate).format("YYYY-MM-DD")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={new Date(startDate)}
+                    onSelect={(value) =>
+                      setStart(dayjs(value).format("YYYY-MM-DD"))
+                    }
+                    initialFocus
                   />
-                </div>
-                <div>
-                  <DatePicker
-                    label={"Выберите дату конца проекта"}
-                    defaultValue={dayjs()}
-                    onChange={(date) => {
-                      if (date != null) handleChangeFinishDate(date);
-                    }}
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <Label style={{ marginBottom: "0.2rem" }}>Конец </Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[240px] justify-start text-left font-normal",
+                      !finishDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {finishDate ? (
+                      dayjs(finishDate).format("YYYY-MM-DD")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={new Date(finishDate)}
+                    onSelect={(value) =>
+                      setFinish(dayjs(value).format("YYYY-MM-DD"))
+                    }
+                    initialFocus
                   />
-                </div>
-              </div>
-            </LocalizationProvider>
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+          <div>
+            {errorMessage === "" ? (
+              <div></div>
+            ) : (
+              <p style={{ margin: "2rem 0", color: "red" }}>{errorMessage}</p>
+            )}
           </div>
           <div style={{ marginTop: "2.5rem" }}>
             <Button
-              variant="outlined"
-              className={styles.createProjectBtn}
+              className="bg-white border border-sky-300 text-black hover:text-white hover:bg-sky-600 ease-in-out"
+              // className={styles.createProjectBtn}
               onClick={(e) => handleAddTask(e)}
             >
               Добавить задачу

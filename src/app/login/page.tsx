@@ -2,7 +2,9 @@
 import { useState, useContext, useEffect } from "react";
 import styles from "./styles.module.css";
 import { redirect, useRouter } from "next/navigation";
-import { TextField, Button, Typography, Box } from "@mui/material";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { useCookies } from "react-cookie"
 import { jwtDecode } from "jwt-decode";
 import { ICookieInfo } from "@/types";
@@ -67,13 +69,26 @@ export default function Login() {
     if(cookies['test-cookies']){
       const token = cookies["test-cookies"];
       const decoded = jwtDecode(token) as ICookieInfo;
-      if(decoded.exp > new Date().getTime()){
+      if(Date.now() >= decoded.exp * 1000){
         removeCookie("test-cookies", {path:'/'});
+        localStorage.removeItem("userId");
+        localStorage.removeItem("token");
+        console.log("cookie removed")
+        setIsAuth(false);
         setIsLoading(false);
         return;
       }
+      // console.log(decoded.exp > new Date().getTime())
+      // if(decoded.exp > new Date().getTime()){
+      //   removeCookie("test-cookies", {path:'/'});
+      //   console.log("cookie removed")
+      //   setIsLoading(false);
+      //   return;
+      // }
       localStorage.setItem("token", JSON.stringify(decoded));
       setIsAuth(true);
+      localStorage.setItem("userId", decoded.userId);
+      console.log("redirected")
       redirect('/main')
     }
     setIsLoading(false);
@@ -99,56 +114,49 @@ export default function Login() {
     router.push("/signup");
   };
 
+  if(isLoading) return null;
+
   return (
     <>
-      {isAuth && errorMessage === "" ? (
+      {/* {isAuth && errorMessage === "" ? (
         redirect("/main")
-      ) : (
-        <Box
-          sx={{
+      ) : ( */}
+        <div
+          className="mx-auto gap-y-2"
+          style={{
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
             flexDirection: "column",
             height: "100vh",
+            width: "20%",
           }}
         >
-          <TextField
+          <Input
             onChange={(e) => {
               setUsername(e.target.value);
               setErrorMessage("");
             }}
-            margin="normal"
             required
-            error={errorMessage !== ""}
-            fullWidth
             id="username"
-            label="Имя пользователя"
             name="username"
-            sx={{ width: "30vw" }}
+            placeholder="Имя пользователя"
           />
-          <TextField
+          <Input
             onChange={(e) => {
               setPassword(e.target.value);
               setErrorMessage("");
             }}
-            margin="normal"
             required
-            fullWidth
-            error={errorMessage !== ""}
             id="password"
-            label="Пароль"
             name="password"
             type="password"
-            sx={{ width: "30vw" }}
+            placeholder="Пароль"
           />
           {errorMessage !== "" && (
-            <Typography
-              variant="body2"
-              fontWeight="200"
-              sx={{
+            <Label
+              style={{
                 color: "red",
-                "&:hover": { textDecoration: "underline" },
                 cursor: "pointer",
                 fontSize: ".875rem",
                 wordWrap: "break-word",
@@ -157,17 +165,15 @@ export default function Login() {
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 display: "-webkit-box",
-                "-webkit-line-clamp": "3",
-                "-webkit-box-orient": "vertical",
               }}
             >
               {errorMessage}
-            </Typography>
+            </Label>
           )}
-          <Button onClick={() => authUser()}>Войти</Button>
-          <Button onClick={() => signUp()}>Зарегистрироваться</Button>
-        </Box>
-      )}
+          <Button className="w-full text-white bg-blue-400 hover:bg-blue-600 ease-in-out transition-300" onClick={() => authUser()}>Войти</Button>
+          <Button className="w-full text-white bg-blue-400 hover:bg-blue-600 ease-in-out transition-300" onClick={() => signUp()}>Зарегистрироваться</Button>
+        </div>
+      {/* )} */}
     </>
   );
 }

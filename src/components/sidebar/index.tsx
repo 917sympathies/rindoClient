@@ -9,15 +9,15 @@ import {
 } from "react";
 import Link from "next/link";
 import { useRouter, useParams, redirect } from "next/navigation";
-import {
-  Button,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  Typography,
-  Drawer,
-} from "@mui/material";
+import { Button } from "../ui/button";
+import {  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,} from "../ui/drawer";
 import { SquareActivity, ArrowDown, Plus } from "lucide-react";
 import AddProjectModal from "../addProjectModal";
 import { useCookies } from "react-cookie";
@@ -80,12 +80,14 @@ const Sidebar = ({}: ISidebarProps) => {
 
   const signOut = () => {
     removeCookie("test-cookies", { path: "/" });
+    localStorage.removeItem("userId");
+    localStorage.removeItem("token");
     router.push("/login");
   };
 
   return (
     <div className={styles.container}>
-      <List disablePadding sx={{ width: "90%", maxHeight: "80vh" }}>
+      <ul style={{ width: "90%", maxHeight: "80vh"}} className="list-none">
         {/* <div
           style={{
             display: "flex",
@@ -134,18 +136,14 @@ const Sidebar = ({}: ISidebarProps) => {
             indo
           </Typography>
         </div> */}
-        <ListItem>
+        <li>
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              justifyContent: "space-between",
+              justifyContent: "space-between"
             }}
           >
-            <ArrowDown
-              style={{ color: "rgb(102, 153, 255)", marginRight: "6px" }}
-              size={16}
-            />
             {/* color: "#4b0066" */}
             <div
               style={{
@@ -158,8 +156,12 @@ const Sidebar = ({}: ISidebarProps) => {
             >
               проекты
             </div>
+            {/* <ArrowDown
+              style={{ color: "rgb(102, 153, 255)", marginRight: "6px" }}
+              size={16}
+            /> */}
           </div>
-        </ListItem>
+        </li>
         {projects &&
           projects.map((project) => (
             <div
@@ -190,12 +192,13 @@ const Sidebar = ({}: ISidebarProps) => {
               </Link>
             </div>
           ))}
-        <ListItemButton
-          className={styles.addProjectBtn}
+        <Button
+        className="w-full rounded-full text-white bg-blue-500  hover:bg-blue-800 ease-in-out duration-300"
+          // className={styles.addProjectBtn}
           onClick={() => setIsOpen(true)}
         >
           <Plus style={{ color: "inherit", marginRight: "6px" }} size={16} />
-          <div
+          <span
             style={{
               color: "inherit",
               fontWeight: "300px",
@@ -204,12 +207,13 @@ const Sidebar = ({}: ISidebarProps) => {
             }}
           >
             Новый проект
-          </div>
-        </ListItemButton>
-      </List>
+          </span>
+        </Button>
+      </ul>
       <Button
-        className={styles.signoutBtn}
-        disableRipple
+      className="w-11/12 rounded-full text-white bg-blue-500  hover:bg-blue-800 ease-in-out duration-300"
+      // className="w-11/12 rounded-full text-white bg-blue-500  hover:text-black hover:bg-neutral-400 ease-in-out duration-300"
+        // className={styles.signoutBtn}
         onClick={() => signOut()}
       >
         <div
@@ -223,14 +227,19 @@ const Sidebar = ({}: ISidebarProps) => {
           Выйти
         </div>
       </Button>
-      <Drawer
+      <Drawer direction='right' open={isOpen}>
+          <DrawerContent className='h-screen top-0 right-0 left-auto mt-0 w-[500px] rounded-none'>
+            <AddProjectModal onClose={() => setIsOpen(false)} setFetch={setFetch} />
+          </DrawerContent>
+      </Drawer>
+      {/* <Drawer
         anchor={"right"}
         open={isOpen}
         onClose={() => {}}
         sx={{ maxWidth: "40vw" }}
       >
         <AddProjectModal onClose={() => setIsOpen(false)} setFetch={setFetch} />
-      </Drawer>
+      </Drawer> */}
     </div>
   );
 };

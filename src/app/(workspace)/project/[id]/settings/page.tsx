@@ -1,27 +1,17 @@
 "use client";
 import styles from "./styles.module.css";
-import {
-  TextField,
-  InputLabel,
-  Button,
-  Modal,
-  Avatar,
-  Typography,
-} from "@mui/material";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label";
+import { Avatar } from "@/components/ui/avatar";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
 import { redirect, useParams, useRouter } from "next/navigation";
-import { IProject, IProjectSettings } from "@/types";
+import { IProject, IProjectSettings, IRole } from "@/types";
 import { SquareCheck, X } from "lucide-react";
 import Editor from "@/components/editor";
 import AddUserModal from "@/components/addUserModal";
-// import dynamic from "next/dynamic";
-
-// const CustomEditor = dynamic(
-//   () => {
-//     return import("../../../../../components/editor/CustomEditor");
-//   },
-//   { ssr: false }
-// );
 
 enum Setting {
   General,
@@ -43,6 +33,9 @@ export default function Page() {
     Setting.General
   );
   const [isModified, setIsModified] = useState<boolean>(false);
+  const [roles, setRoles] = useState<IRole[]>([]);
+  const [selectedRole, setSelectedRole] = useState<IRole>({} as IRole)
+
 
   useEffect(() => {
     if (name !== projectSettings.name || desc !== projectSettings.description)
@@ -69,10 +62,26 @@ export default function Page() {
           ...prev,
           users: [...data.users, data.owner],
         }));
-        console.log(data);
+        // console.log(data);
+      }
+    }
+    async function fetchRoles() {
+      const response = await fetch(
+        `http://localhost:5000/api/role?projectId=${id}`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setRoles(data);
+        setSelectedRole(data[0])
       }
     }
     fetchInfo();
+    fetchRoles();
   }, []);
 
   const saveChanges = () => {
@@ -129,7 +138,7 @@ export default function Page() {
           }
           onClick={() => setCurrentSetting(Setting.General)}
         >
-          <Typography style={{ font: "inherit" }}>Общие</Typography>
+          <Label style={{ font: "inherit" }}>Общие</Label>
         </div>
         <div
           className={
@@ -139,7 +148,7 @@ export default function Page() {
           }
           onClick={() => setCurrentSetting(Setting.Users)}
         >
-          <Typography style={{ font: "inherit" }}>Участники проекта</Typography>
+          <Label style={{ font: "inherit" }}>Участники проекта</Label>
         </div>
         <div
           className={
@@ -149,7 +158,7 @@ export default function Page() {
           }
           onClick={() => setCurrentSetting(Setting.Roles)}
         >
-          <Typography style={{ font: "inherit" }}>Роли</Typography>
+          <Label style={{ font: "inherit" }}>Роли</Label>
         </div>
       </div>
       <div className={styles.body}>
@@ -159,28 +168,25 @@ export default function Page() {
               return (
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   {/* <InputLabel id="namelabel">Имя</InputLabel> */}
-                  <TextField
-                    size="small"
-                    label="Название проекта"
+                  <Input className="focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-slate-950 focus-visible:ring-offset-0"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
                   {/* <InputLabel>Описание</InputLabel> */}
-                  <TextField
-                    size="small"
-                    label="Описание проекта"
+                  <Input className="focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-slate-950 focus-visible:ring-offset-0"
                     value={desc}
                     onChange={(e) => setDesc(e.target.value)}
                     style={{ marginTop: "2rem", marginBottom: "2rem" }}
                   />
-                  <div>
-                  <Button onClick={() => setIsModalOpen(true)} sx={{ color: "red", border: "1px solid red", marginRight: "0.2rem" }}>Удалить проект</Button>
+                  <div className="flex flex-row gap-8">
+                  <Button onClick={() => setIsModalOpen(true)} className="bg-white text-red-700 border border-red-700 hover:bg-red-500 hover:text-white" >Удалить проект</Button>
                   <Button
-                    style={
-                      isModified
-                        ? { color: "green", border: "1px solid green" }
-                        : { visibility: "hidden" }
-                    }
+                  className={isModified ? "border border-green-500 bg-white text-green-500 hover:bg-green-500 hover:text-white ease-in-out duration-300" : "invisible"}
+                    // style={
+                    //   isModified
+                    //     ? { color: "green", border: "1px solid green" }
+                    //     : { visibility: "hidden" }
+                    // }
                     onClick={() => saveChanges()}
                   >
                     Сохранить изменения
@@ -192,17 +198,20 @@ export default function Page() {
               return (
                 <div style={{ color: "black", width: "80%" }}>
                   <Button
-                    style={{
-                      border: "1px solid #1976D2",
-                      marginBottom: "2rem",
-                    }}
+                  className="text-white bg-blue-500 hover:bg-blue-800 mb-4 rounded-full"
+                    // style={{
+                    //   border: "1px solid #1976D2",
+                    //   marginBottom: "2rem",
+                    // }}
                     onClick={() => setIsUserModalOpen(true)}
                   >
                     Добавить пользователя
                   </Button>
+                  <div className="flex flex-col gap-2">
                   {projectSettings.users ? (
                     projectSettings.users.map((user) => (
                       <div
+                        key={user.id}
                         style={{
                           backgroundColor: "rgba(1, 1, 1, 0.1)",
                           color: "inherit",
@@ -210,27 +219,32 @@ export default function Page() {
                           flexDirection: "row",
                           alignItems: "center",
                           justifyContent: "space-between",
-                          padding: "0.1rem 1rem",
+                          padding: "0.6rem 1rem",
                           marginBottom: "0.2rem",
                           borderRadius: "0.4rem",
                         }}
                       >
                         <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            alignItems: "center",
-                          }}
+                          className="flex flex-row items-center"
+                          // style={{
+                          //   display: "flex",
+                          //   flexDirection: "row",
+                          //   alignItems: "center",
+                          // }}
                         >
                           <Avatar
-                            sx={{
-                              bgcolor: "#4198FF",
-                              width: "4vh",
-                              height: "4vh",
-                              fontSize: "1rem",
-                              marginRight: "0.8rem",
+                            style={{
+                              backgroundColor: "#4198FF",
+                              color: "white",
+                              width: "2.5vh",
+                              height: "2.5vh",
+                              fontSize: "0.6rem",
+                              margin: "0.1rem",
+                              marginLeft: "0.4rem",
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
                             }}
-                            src="/static/images/avatar/1.jpg"
                           >
                             {user?.firstName?.slice(0, 1)}
                             {user?.lastName?.slice(0, 1)}
@@ -242,64 +256,104 @@ export default function Page() {
                               alignItems: "center",
                             }}
                           >
-                            <Typography>{user.username}</Typography>
-                            <Typography>{`${user.firstName} ${user.lastName}`}</Typography>
+                            <Label>{user.username}</Label>
+                            <Label>{`${user.firstName} ${user.lastName}`}</Label>
                           </div>
                         </div>
-                        <X size={16} className={styles.deleteUserBtn}></X>
+                        <X size={24} className={styles.deleteUserBtn}></X>
                       </div>
                     ))
                   ) : (
                     <div></div>
                   )}
+                  </div>
                 </div>
               );
             case Setting.Roles:
-              return <div></div>;
+              return (
+                <div className="flex flex-row items-start">
+                  <ul className="list-none ml-8 rounded-l-full">
+                    {roles.map(role => (
+                      <li className={selectedRole.id === role.id ? "rounded-l-full bg-gray-100" : "bg-white"} key={role.id} onClick={() => setSelectedRole(role)}>
+                        <div className={selectedRole.id === role.id ? "p-4" : "p-4 hover:bg-gray-50 rounded-l-full ease-in-out duration-300"}>
+                          {role.name}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="bg-gray-100 rounded-r-lg rounded-bl-lg">
+                    <div className="p-4">
+                      <Input className="rounded-full focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-slate-950 focus-visible:ring-offset-0" 
+                      placeholder="Название роли"></Input>
+                      <div className="flex flex-row items-center pt-4 pr-4 gap-4">
+                        <Switch id='canAddTask' checked={selectedRole ? selectedRole.canAddTask : false} onCheckedChange={(value : boolean) => setSelectedRole({...selectedRole, canAddTask: value})}></Switch>
+                        <Label htmlFor="canAddTask">Может добавлять задачи в проект</Label>
+                      </div>
+                      <div className="flex flex-row items-center pt-4 pr-4 gap-4">
+                        <Switch id='canDeleteTask' checked={selectedRole ? selectedRole.canDeleteTask : false} onCheckedChange={(value : boolean) => setSelectedRole({...selectedRole, canDeleteTask: value})}></Switch>
+                        <Label htmlFor="canDeleteTask">Может удалять задачи из проекта</Label>
+                      </div>
+                      <div className="flex flex-row items-center pt-4 pr-4 gap-4">
+                        <Switch id='canUseChat' 
+                        checked={selectedRole ? selectedRole.canUseChat : false} 
+                        onCheckedChange={(value : boolean) => setSelectedRole({...selectedRole, canUseChat: value})}
+                        ></Switch>
+                        <Label htmlFor="canUseChat">Может пользоваться чатом</Label>
+                      </div>
+                      <Button className="w-full mt-4 text-black bg-gray-200 hover:bg-white ease-in-out duration-300"
+                      onClick={() => console.log(selectedRole)}>Сохранить изменения</Button>
+                    </div>
+                  </div>
+                </div>
+              )
             default:
               return <div></div>;
           }
         })()}
       </div>
-      <Modal
+      <Dialog
         open={isUserModalOpen}
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignSelf: "center",
-          alignContent: "center",
-        }}
+        // style={{
+        //   display: "flex",
+        //   justifyContent: "center",
+        //   alignSelf: "center",
+        //   alignContent: "center",
+        // }}
       >
-        <AddUserModal onClose={() => setIsUserModalOpen(false)} />
-      </Modal>
-      <Modal
+        <DialogContent>
+          <AddUserModal onClose={() => setIsUserModalOpen(false)} />
+        </DialogContent>
+      </Dialog>
+      <Dialog
         open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignSelf: "center",
-          alignContent: "center",
-        }}
+        // onClose={() => setIsModalOpen(false)}
+        // style={{
+        //   display: "flex",
+        //   justifyContent: "center",
+        //   alignSelf: "center",
+        //   alignContent: "center",
+        // }}
       >
+        <DialogContent>
         <div
           style={{
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
             backgroundColor: "white",
-            width: "20%",
+            width: "100%",
             borderRadius: "8px",
             padding: "10px",
+            gap: 8
           }}
         >
-          <Typography sx={{ color: "black", alignSelf: "center" }}>
+          <Label style={{ color: "black", alignSelf: "center" }}>
             Вы действительно хотите удалить проект?
-          </Typography>
+          </Label>
           <div style={{ display: "flex", alignSelf: "center" }}>
             <Button
               onClick={() => handleDeleteProject()}
-              sx={{
+              style={{
                 color: "white",
                 backgroundColor: "green",
                 marginRight: "0.4rem",
@@ -309,13 +363,14 @@ export default function Page() {
             </Button>
             <Button
               onClick={() => setIsModalOpen(false)}
-              sx={{ color: "white", backgroundColor: "red" }}
+              style={{ color: "white", backgroundColor: "red" }}
             >
               Нет
             </Button>
           </div>
         </div>
-      </Modal>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -413,7 +468,7 @@ export default function Page() {
 //         <InputLabel style={{ alignSelf: "center", fontSize: "1.2rem" }}>
 //           Название проекта
 //         </InputLabel>
-//         <TextField
+//         <Input
 //           value={
 //             // projectSettings == null ? "Название проекта" : projectSettings.name
 //             projectSettings.name || "Название проекта"
@@ -470,7 +525,7 @@ export default function Page() {
 //         <InputLabel style={{ alignSelf: "center", fontSize: "1.2rem"}}>
 //           Ссылка приглашения
 //         </InputLabel>
-//         <TextField
+//         <Input
 //           value={
 //             projectSettings.inviteLink || ""
 //           }
@@ -490,14 +545,14 @@ export default function Page() {
 //           marginTop: "1rem",
 //         }}
 //       >
-//         <Button onClick={() => setIsModalOpen(true)} sx={{ color: "red" }}>
+//         <Button onClick={() => setIsModalOpen(true)} style={{ color: "red" }}>
 //           Удалить проект
 //         </Button>
 //       </div>
 //       <Modal
 //         open={isModalOpen}
 //         onClose={() => setIsModalOpen(false)}
-//         sx={{
+//         style={{
 //           display: "flex",
 //           justifyContent: "center",
 //           alignSelf: "center",
@@ -515,13 +570,13 @@ export default function Page() {
 //             padding: "10px",
 //           }}
 //         >
-//           <Typography sx={{ color: "black", alignSelf: "center" }}>
+//           <Label style={{ color: "black", alignSelf: "center" }}>
 //             Вы действительно хотите удалить проект?
-//           </Typography>
+//           </Label>
 //           <div style={{ display: "flex", alignSelf: "center" }}>
 //             <Button
 //               onClick={() => handleDeleteProject()}
-//               sx={{
+//               style={{
 //                 color: "white",
 //                 backgroundColor: "green",
 //                 marginRight: "0.4rem",
@@ -531,7 +586,7 @@ export default function Page() {
 //             </Button>
 //             <Button
 //               onClick={() => setIsModalOpen(false)}
-//               sx={{ color: "white", backgroundColor: "red" }}
+//               style={{ color: "white", backgroundColor: "red" }}
 //             >
 //               Нет
 //             </Button>

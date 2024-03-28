@@ -5,7 +5,9 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { IProject, ITask, IStageDto, IStage } from "@/types";
-import { Drawer, Button, TextField } from "@mui/material";
+import { Drawer, DrawerContent } from "../ui/drawer";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 import {
   Droppable,
   Draggable,
@@ -14,6 +16,8 @@ import {
 } from "react-beautiful-dnd";
 import Stage from "./stage";
 import AddTaskModal from "../addTaskModal";
+import { IUserRights } from "@/types";
+
 
 export default function Kanban() {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +27,7 @@ export default function Kanban() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [stageSelected, setStageSelected] = useState<string>("");
   const [newStageName, setNewStageName] = useState<string>("");
+  const [rights, setRights] = useState<IUserRights>({} as IUserRights);
   const [canAddStage, setCanAddStage] = useState<boolean>(
     stages?.length !== 3
   );
@@ -30,6 +35,7 @@ export default function Kanban() {
   useEffect(() => {
     //getProjectInfo(id);
     getStages(id);
+    getRights();
   }, [id]);
 
   useEffect(() => {
@@ -39,6 +45,18 @@ export default function Kanban() {
       setFetch(false);
     }
   }, [toFetch]);
+
+  const getRights = async () => {
+    const userId = localStorage.getItem("userId");
+    const response = await fetch(`http://localhost:5000/api/role/${id}/${userId}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+    const data = await response.json();
+    setRights(data)
+    console.log(data)
+  }
 
   const handleAddStage = async () => {
     setCanAddStage(false);
@@ -128,29 +146,18 @@ export default function Kanban() {
                 }}
                 handleDeleteStage={handleDeleteStage}
                 setFetch={setFetch}
+                rights={rights}
               />
             ))}
         </DragDropContext>
-        {stages && stages.length !== 4 ? (
+        {stages && rights.canAddStage && stages.length !== 4 ? (
           <div className={styles.container}>
-            <TextField
+            <Input
+              className="rounded-none text-center border-0 bg-background  focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-slate-950 focus-visible:ring-offset-0"
               onChange={(e) => setNewStageName(e.target.value)}
               placeholder="Название стадии"
-              variant="outlined"
-              sx={{
+              style={{
                 flexGrow: 1,
-                "& .MuiOutlinedInput-input": {
-                  padding: "1rem",
-                  textAlign: "center",
-                  color: "rgb(102,102,102)",
-                  fontWeight: "400",
-                  fontFamily: "inherit"
-                },
-                "& .MuiOutlinedInput-notchedOutline": { border: "unset " },
-                "& .MuiOutlinedInput-root": {
-                  fontSize: "1rem",
-                  fontWeight: "400",
-                },
               }}
             />
             <Button className={styles.addbutton} onClick={() => handleAddStage()}>
@@ -161,11 +168,12 @@ export default function Kanban() {
           <div></div>
         )}
         <Drawer
-          anchor={"right"}
+          direction={"right"}
           open={isModalOpen}
           onClose={() => {}}
-          sx={{ maxWidth: "40vw", width: "40vw" }}
+          // sty={{ maxWidth: "40vw", width: "40vw" }}
         >
+          <DrawerContent className='h-screen top-0 right-0 left-auto mt-0 w-[500px] rounded-none'>
           <AddTaskModal
             onClose={() => setIsModalOpen(false)}
             // projectId={project?.id}
@@ -173,6 +181,7 @@ export default function Kanban() {
             setFetch={setFetch}
             // users={project?.users && [...project?.users, project?.owner]}
           />
+          </DrawerContent>
         </Drawer>
       </div>
     </div>

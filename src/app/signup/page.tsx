@@ -2,7 +2,9 @@
 import styles from "./styles.module.css";
 import { useState, useContext } from "react";
 import { useRouter } from "next/navigation"
-import { Button, TextField, Typography } from "@mui/material";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function SignUp() {
   const router = useRouter();
@@ -40,50 +42,42 @@ export default function SignUp() {
 
   return (
     <div className={styles.container}>
-      <TextField
+      <Input
         required
-        label="Имя пользователя"
+        placeholder="Имя пользователя"
         value={username}
-        error={errorMessage !== ""}
         onChange={(e) => setUsername(e.target.value)}
-      ></TextField>
-      <TextField
+      ></Input>
+      <Input
         required
-        label="Пароль"
+        placeholder="Пароль"
         value={password}
         type="password"
-        error={errorMessage !== ""}
         onChange={(e) => setPassword(e.target.value)}
-      ></TextField>
-      <TextField
+      ></Input>
+      <Input
         required
-        label="E-mail"
+        placeholder="E-mail"
         type="email"
         value={email}
-        error={errorMessage !== ""}
         onChange={(e) => setEmail(e.target.value)}
-      ></TextField>
-      <TextField
+      ></Input>
+      <Input
         required
-        label="Имя"
+        placeholder="Имя"
         value={firstName}
-        error={errorMessage !== ""}
         onChange={(e) => setFirstName(e.target.value)}
-      ></TextField>
-      <TextField
+      ></Input>
+      <Input
         required
-        label="Фамилия"
+        placeholder="Фамилия"
         value={lastName}
-        error={errorMessage !== ""}
         onChange={(e) => setLastName(e.target.value)}
-      ></TextField>
+      ></Input>
       {errorMessage !== "" && (
-        <Typography
-          variant="body2"
-          fontWeight="200"
-          sx={{
+        <Label
+          style={{
             color: "red",
-            "&:hover": { textDecoration: "underline" },
             cursor: "pointer",
             fontSize: ".875rem",
             wordWrap: "break-word",
@@ -92,14 +86,12 @@ export default function SignUp() {
             overflow: "hidden",
             textOverflow: "ellipsis",
             display: "-webkit-box",
-            "-webkit-line-clamp": "3",
-            "-webkit-box-orient": "vertical",
           }}
         >
           {errorMessage}
-        </Typography>
+        </Label>
       )}
-      <Button onClick={() => signUp()}>Зарегистрироваться</Button>
+      <Button className="w-full text-white bg-blue-400 hover:bg-blue-600 ease-in-out transition-300" onClick={() => signUp()}>Зарегистрироваться</Button>
     </div>
   );
 }

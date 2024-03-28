@@ -1,8 +1,8 @@
 'use client';
 import styles from "./styles.module.css";
-import { TextField } from "@mui/material";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 import { User2, X, UserRoundPlus  } from "lucide-react";
-import { Button } from "@mui/material";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 
@@ -30,7 +30,7 @@ export default function AddUserModal({onClose} : ModalProps){
             flexDirection: "column",
             justifyContent: "center",
             backgroundColor: "white",
-            width: "20%",
+            width: "100%",
             borderRadius: "8px",
             padding: "10px",
             color: "black"
@@ -42,9 +42,9 @@ export default function AddUserModal({onClose} : ModalProps){
                 </div>
                 <X size={24} onClick={onClose} className={styles.closeBtn}></X> 
             </div>
-            <div style={{display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
-                <TextField placeholder="Имя пользователя" value={username} onChange={(e) => setUsername(e.target.value) }/>
-                <Button style={{marginRight: "0.4rem"}} onClick={() => handleAddUser()}>Отправить</Button>
+            <div style={{display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8}}>
+                <Input className="focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-slate-950 focus-visible:ring-offset-0" placeholder="Имя пользователя" value={username} onChange={(e) => setUsername(e.target.value) }/>
+                <Button className="text-white bg-blue-500 hover:bg-blue-800" style={{marginRight: "0.4rem"}} onClick={() => handleAddUser()}>Отправить</Button>
                 {/* <UserRoundPlus size={36}/> */}
             </div>
         </div>

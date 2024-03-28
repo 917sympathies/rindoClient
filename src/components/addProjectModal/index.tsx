@@ -1,25 +1,23 @@
-'use client'
+"use client";
 import styles from "./styles.module.css";
 import { useState, useEffect, useRef, Dispatch, SetStateAction } from "react";
+import { Label } from "../ui/label";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { cn } from "@/lib/utils";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
 import {
-  Box,
-  Button,
-  Input,
-  InputBase,
-  TextField,
-  Typography,
-} from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import ClearIcon from "@mui/icons-material/Clear";
-import CloseIcon from "@mui/icons-material/Close";
-import React from 'react';
-//import dynamic from 'next/dynamic';
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import React from "react";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/navigation";
-import { jwtDecode } from "jwt-decode"
+import { jwtDecode } from "jwt-decode";
 import { ICookieInfo } from "@/types";
-import { LocalizationProvider, DatePicker  } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { X } from "lucide-react";
 import dayjs from "dayjs";
 import Editor from "../editor";
 
@@ -28,78 +26,85 @@ import Editor from "../editor";
 // }, { ssr: false } );
 
 interface IAddProjectModalProps {
-  setFetch: Dispatch<SetStateAction<boolean>>,
+  setFetch: Dispatch<SetStateAction<boolean>>;
   onClose: () => void;
 }
 
-interface IProjectDto{
-  name: string,
-  description: string,
-  ownerId: string,
-  startDate: string,
-  finishDate: string
+interface IProjectDto {
+  name: string;
+  description: string;
+  ownerId: string;
+  startDate: string;
+  finishDate: string;
 }
 
 const AddProjectModal = ({ setFetch, onClose }: IAddProjectModalProps) => {
   const router = useRouter();
-  const [cookies, setCookie, removeCookie] = useCookies(['test-cookies']);
+  const [cookies, setCookie, removeCookie] = useCookies(["test-cookies"]);
   const [project, setProject] = useState<IProjectDto>({} as IProjectDto);
-  const [startDate, setStart] = useState(dayjs().format('YYYY-MM-DD'))
-  const [finishDate, setFinish] = useState(dayjs().format('YYYY-MM-DD'))
+  // const [startDate, setStart] = useState(dayjs().format('YYYY-MM-DD'))
+  // const [finishDate, setFinish] = useState(dayjs().format('YYYY-MM-DD'))
+  const [startDate, setStart] = useState(dayjs().format("YYYY-MM-DD"));
+  const [finishDate, setFinish] = useState(dayjs().format("YYYY-MM-DD"));
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [desc, setDesc] = useState<string>("");
 
   const handleCreateProject = async () => {
-    const token = cookies["test-cookies"];
-    if(token === undefined) router.push("/login");
-    const decoded = jwtDecode(token) as ICookieInfo;
-    project.ownerId = decoded.userId;
+    if (new Date(startDate) > new Date(finishDate)) {
+      setErrorMessage("Вы выбрали некорректные даты!");
+      return;
+    }
+    const userId = localStorage.getItem("userId");
+    project.ownerId = userId!;
+    // const token = cookies["test-cookies"];
+    // if (token === undefined) router.push("/login");
+    // const decoded = jwtDecode(token) as ICookieInfo;
+    // project.ownerId = decoded.userId;
     const response = await fetch("http://localhost:5000/api/project", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        credentials: 'include',
-        body: JSON.stringify(project)
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(project),
     });
-    const data = await response.json()
-    if(data.errors === undefined){
+    const data = await response.json();
+    if (data.errors === undefined) {
       setFetch(true);
       onClose();
+    } else {
+      if (data.errors.Name !== undefined) setErrorMessage(data.errors.Name);
     }
-    else{
-        if (data.errors.Name !== undefined) setErrorMessage(data.errors.Name);
-    }
-  }
+  };
 
   useEffect(() => {
     setProject((prevState) => ({
-        ...prevState,
-        finishDate: finishDate,
-      }));
-  }, [finishDate])
+      ...prevState,
+      finishDate: finishDate,
+    }));
+  }, [finishDate]);
 
   useEffect(() => {
     setProject((prevState) => ({
-        ...prevState,
-        startDate: startDate,
-      }));
-  }, [startDate])
+      ...prevState,
+      startDate: startDate,
+    }));
+  }, [startDate]);
 
   useEffect(() => {
     setProject((prevState) => ({
-        ...prevState,
-        description: desc,
-      }));
-  }, [desc])
+      ...prevState,
+      description: desc,
+    }));
+  }, [desc]);
 
   const handleChangeStartDate = (date: any) => {
-      const temp = dayjs(date.toDate()).format('YYYY-MM-DD')
-      setStart(temp);
-  }
+    const temp = dayjs(date.toDate()).format("YYYY-MM-DD");
+    setStart(temp);
+  };
 
-  const handleChangeFinishDate = (date : any) => {
-      const temp = dayjs(date.toDate()).format('YYYY-MM-DD')
-      setFinish(temp);
-  }
+  const handleChangeFinishDate = (date: any) => {
+    const temp = dayjs(date.toDate()).format("YYYY-MM-DD");
+    setFinish(temp);
+  };
 
   return (
     <>
@@ -121,30 +126,29 @@ const AddProjectModal = ({ setFetch, onClose }: IAddProjectModalProps) => {
             alignItems: "center",
           }}
         >
-          <Typography
-            variant="body2"
-            fontWeight="500"
-            sx={{
+          <Label
+            style={{
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
               textTransform: "capitalize",
               fontSize: "0.95rem",
+              fontWeight: "500",
               color: "black",
               fontFamily: "inherit",
             }}
           >
             Новый проект
-          </Typography>
-          <CloseIcon
-            sx={{
+          </Label>
+          <X
+            style={{
               cursor: "pointer",
               borderRadius: "50%",
               fontSize: "1.2rem",
-              "&:hover": {
-                backgroundColor: "white",
-                transition: "all .1s ease-in-out",
-              },
+              // "&:hover": {
+              //   backgroundColor: "white",
+              //   transition: "all .1s ease-in-out",
+              // },
               padding: ".5vh",
               transition: "all .1s ease-in-out",
             }}
@@ -153,23 +157,22 @@ const AddProjectModal = ({ setFetch, onClose }: IAddProjectModalProps) => {
         </div>
         <div style={{ padding: "1rem 3rem" }}>
           <div style={{ marginBottom: ".5rem" }}>
-            <Typography
-              variant="body2"
-              fontWeight="500"
-              sx={{
+            <Label
+              style={{
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 textTransform: "capitalize",
                 fontSize: "0.9rem",
+                fontWeight: "500",
                 color: "black",
-                mb: ".5rem",
+                marginBottom: ".5rem",
                 fontFamily: "inherit",
               }}
             >
               Название проекта
-            </Typography>
-            <TextField
+            </Label>
+            <Input
               onChange={(event) => {
                 setErrorMessage("");
                 setProject((prevState) => ({
@@ -178,17 +181,8 @@ const AddProjectModal = ({ setFetch, onClose }: IAddProjectModalProps) => {
                 }));
               }}
               placeholder="Без названия"
-              variant="outlined"
-              fullWidth
-              sx={{
+              style={{
                 width: "100%",
-                "& .MuiOutlinedInput-input": { padding: 0 },
-                "& .MuiOutlinedInput-notchedOutline": { border: "unset " },
-                "& .MuiOutlinedInput-root": {
-                  fontSize: "2.7rem",
-                  fontWeight: "700",
-                  fontFamily: "inherit",
-                },
               }}
             />
           </div>
@@ -238,7 +232,7 @@ const AddProjectModal = ({ setFetch, onClose }: IAddProjectModalProps) => {
                          }}
                     >
                       <AddIcon sx={{color: 'black', fontSize: '.8rem', borderRadius: '50%', '&:hover': {backgroundColor: '#F4F6F8', cursor: 'pointer'}}}/>
-                      <Typography sx={{textTransform: 'lowercase', fontSize: '.8rem', color: 'black', ml: '.3rem'}}>Добавить тег</Typography>
+                      <Label sx={{textTransform: 'lowercase', fontSize: '.8rem', color: 'black', ml: '.3rem'}}>Добавить тег</Label>
                     </div> */}
           </div>
           <div
@@ -248,23 +242,22 @@ const AddProjectModal = ({ setFetch, onClose }: IAddProjectModalProps) => {
               maxWidth: "calc(50vw - 6rem)",
             }}
           >
-            <Typography
-              variant="body2"
-              fontWeight="500"
-              sx={{
+            <Label
+              style={{
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 textTransform: "capitalize",
                 fontSize: "0.9rem",
+                fontWeight: "500",
                 color: "black",
-                mt: "1.5rem",
-                mb: ".5rem",
+                marginTop: "1.5rem",
+                marginBottom: ".5rem",
                 fontFamily: "inherit",
               }}
             >
               Описание проекта
-            </Typography>
+            </Label>
             <div
               style={{
                 position: "relative",
@@ -273,40 +266,95 @@ const AddProjectModal = ({ setFetch, onClose }: IAddProjectModalProps) => {
                 maxWidth: "100%",
               }}
             >
-              <Editor desc={desc} setDesc={setDesc}/>
-                {/* <CustomEditor
+              <Editor desc={desc} setDesc={setDesc} />
+              {/* <CustomEditor
                     // initialData={desc}
                     setState={setDesc}
                 /> */}
             </div>
           </div>
-          <div style={{ marginTop: "1rem" }}>
-            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'ru'}>
-              <div style={{display:"flex", flexDirection: "column"}}>
-                <div style={{marginBottom: "0.8rem"}}>
-                <DatePicker label={"Выберите дату начала проекта"} defaultValue={dayjs()}
-                onChange={(date) => {
-                  if(date != null)
-                    handleChangeStartDate(date);
-                }}/>
-                </div>
-                <div>
-                <DatePicker label={"Выберите дату конца проекта"} defaultValue={dayjs()}
-                onChange={(date) => {
-                  if(date != null)
-                    handleChangeFinishDate(date);
-                }}/>
-                </div>
-              </div>
-            </LocalizationProvider>
+          <div
+            style={{
+              marginTop: "1rem",
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+            }}
+          >
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <Label style={{ marginBottom: "0.2rem" }}>Начало проекта</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[240px] justify-start text-left font-normal",
+                      !startDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {startDate ? (
+                      dayjs(startDate).format("YYYY-MM-DD")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={new Date(startDate)}
+                    onSelect={(value) =>
+                      setStart(dayjs(value).format("YYYY-MM-DD"))
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <Label style={{ marginBottom: "0.2rem" }}>Конец проекта</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[240px] justify-start text-left font-normal",
+                      !finishDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {finishDate ? (
+                      dayjs(finishDate).format("YYYY-MM-DD")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={new Date(finishDate)}
+                    onSelect={(value) =>
+                      setFinish(dayjs(value).format("YYYY-MM-DD"))
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
           </div>
           <div>
-            {errorMessage === "" ? <div></div> : <p style={{margin: "2rem 0", color: "red"}}>{errorMessage}</p>}
+            {errorMessage === "" ? (
+              <div></div>
+            ) : (
+              <p style={{ margin: "2rem 0", color: "red" }}>{errorMessage}</p>
+            )}
           </div>
           <div style={{ marginTop: "2.5rem" }}>
             <Button
-              variant="outlined"
-              className={styles.createProjectBtn}
+            className="bg-white border border-sky-300 text-black hover:text-white hover:bg-sky-600 ease-in-out"
+              // className={styles.createProjectBtn}
               onClick={() => handleCreateProject()}
             >
               Создать проект
